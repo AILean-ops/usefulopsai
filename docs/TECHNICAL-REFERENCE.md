@@ -11,7 +11,11 @@
 - Initial push: commit `aefec0b` (`Initialize UsefulOps AI workspace`) pushed to `main` on 2026-05-29.
 - Repo-local Git identity for future commits: `Rowan Vale <rowan.vale@usefulopsai.com>`.
 - Planned GOG account: `rowan.vale@usefulopsai.com`.
-- Planned GOG client label: `usefulops`.
+- GOG account: `rowan.vale@usefulopsai.com`.
+- GOG client label: `usefulops`.
+- GOG configured successfully on 2026-05-29 with services `calendar,contacts,docs,drive,forms,gmail,sheets`.
+- Gmail smoke test returned the Google Workspace welcome email.
+- Drive smoke test completed successfully and returned no files.
 - Setup guide: `/Users/aileansolutions/usefulopsai/docs/GOG-SETUP.md`.
 
 The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machine because GitHub SSH access is configured through the `github-workspace` host alias.

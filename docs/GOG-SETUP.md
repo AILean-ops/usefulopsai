@@ -4,6 +4,16 @@
 **GOG client label:** `usefulops`
 **Purpose:** Give Sauron/Rowan controlled CLI access to UsefulOps AI Gmail, Calendar, Drive, Contacts, Docs, Sheets, and Forms.
 
+## Current Status
+
+Configured successfully on 2026-05-29.
+
+- OAuth client stored as `usefulops`.
+- Account authorized: `rowan.vale@usefulopsai.com`.
+- Services authorized: Gmail, Calendar, Drive, Contacts, Docs, Sheets, Forms.
+- Gmail smoke test succeeded by reading the Google Workspace welcome email.
+- Drive smoke test succeeded; Drive returned no files yet.
+
 ## Brian Setup Steps
 
 ### 1. Create Or Confirm The Google Workspace User
@@ -107,4 +117,3 @@ gog drive search "name contains 'UsefulOps'" --max 10 --account rowan.vale@usefu
 GOG access does not grant authority to send outreach, contact prospects, spend money, or create calendar events with third parties unless the action fits the approved sandbox authority envelope.
 
 Email sends remain governed by `SAURON-BUSINESS-SANDBOX.md`.
-
