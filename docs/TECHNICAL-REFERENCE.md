@@ -9,7 +9,10 @@
 - Local repo: `/Users/aileansolutions/usefulopsai`
 - Current status at creation: repo existed on GitHub and cloned successfully as an empty repository.
 - Initial push: commit `aefec0b` (`Initialize UsefulOps AI workspace`) pushed to `main` on 2026-05-29.
-- Repo-local Git identity for future commits: `Rowan Vale <rowan@usefulopsai.com>`.
+- Repo-local Git identity for future commits: `Rowan Vale <rowan.vale@usefulopsai.com>`.
+- Planned GOG account: `rowan.vale@usefulopsai.com`.
+- Planned GOG client label: `usefulops`.
+- Setup guide: `/Users/aileansolutions/usefulopsai/docs/GOG-SETUP.md`.
 
 The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machine because GitHub SSH access is configured through the `github-workspace` host alias.
 

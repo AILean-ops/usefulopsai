@@ -7,7 +7,7 @@ UsefulOps AI is the public-facing sandbox business operated by Rowan Vale under 
 - Brand: UsefulOps AI
 - Domain: `UsefulOpsAI.com`
 - Public operator persona: Rowan Vale
-- Recommended primary mailbox: `rowan@usefulopsai.com`
+- Recommended primary mailbox: `rowan.vale@usefulopsai.com`
 - Recommended aliases: `hello@usefulopsai.com`, `ops@usefulopsai.com`
 
 Sauron is an internal identity only and must not appear in public-facing UsefulOps AI material.
