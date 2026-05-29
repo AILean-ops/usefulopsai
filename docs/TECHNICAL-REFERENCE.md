@@ -24,9 +24,10 @@ The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machin
 
 - Domain: `UsefulOpsAI.com`.
 - Static site source: `/Users/aileansolutions/usefulopsai/website/`.
-- Current build output directory: `website`.
+- Build command: `npm run build`.
+- Current build output directory: `dist`.
 - Wrangler config: `/Users/aileansolutions/usefulopsai/wrangler.toml`.
-- Pages project name intended: `usefulopsai`.
+- Pages project name: `usefulopsai-com`.
 - 2026-05-29 GitHub path test: static placeholder site added and pushed to `main`.
 - 2026-05-29 Cloudflare CLI status: `npx wrangler whoami` reports not authenticated; `npx wrangler pages project list` fails without `CLOUDFLARE_API_TOKEN`. Brian must connect Cloudflare Pages to the GitHub repo or provide a Cloudflare API token/login before Sauron can publish/verify deployment from the Mac mini.
 
