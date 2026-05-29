@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "mkdir -p dist && cp -R website/. dist/"
+    "build": "mkdir -p dist && cp -R website/. dist/",
+    "deploy": "npx wrangler pages deploy dist --project-name=usefulopsai-com"
   }
 }
-

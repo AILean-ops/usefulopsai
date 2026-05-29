@@ -25,6 +25,7 @@ The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machin
 - Domain: `UsefulOpsAI.com`.
 - Static site source: `/Users/aileansolutions/usefulopsai/website/`.
 - Build command: `npm run build`.
+- Deploy command, if Cloudflare asks for one: `npm run deploy`.
 - Current build output directory: `dist`.
 - Wrangler config: `/Users/aileansolutions/usefulopsai/wrangler.toml`.
 - Pages project name: `usefulopsai-com`.
