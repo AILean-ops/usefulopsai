@@ -20,6 +20,16 @@
 
 The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machine because GitHub SSH access is configured through the `github-workspace` host alias.
 
+## Website / Cloudflare Pages
+
+- Domain: `UsefulOpsAI.com`.
+- Static site source: `/Users/aileansolutions/usefulopsai/website/`.
+- Current build output directory: `website`.
+- Wrangler config: `/Users/aileansolutions/usefulopsai/wrangler.toml`.
+- Pages project name intended: `usefulopsai`.
+- 2026-05-29 GitHub path test: static placeholder site added and pushed to `main`.
+- 2026-05-29 Cloudflare CLI status: `npx wrangler whoami` reports not authenticated; `npx wrangler pages project list` fails without `CLOUDFLARE_API_TOKEN`. Brian must connect Cloudflare Pages to the GitHub repo or provide a Cloudflare API token/login before Sauron can publish/verify deployment from the Mac mini.
+
 ## Local Private State
 
 Private operating state lives under:
