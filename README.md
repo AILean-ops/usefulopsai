@@ -36,3 +36,18 @@ The daily UsefulOps cron job uses `scripts/operator_loop.py` to create durable
 `operator_runs` and `operator_checkpoints` records in the local SQLite database.
 This keeps the work restartable if a detached Codex/OpenClaw run dies before it
 can deliver a final report.
+
+## Private Local Dashboard
+
+Brian can view the UsefulOps operating dashboard locally at:
+
+`http://localhost:8766`
+
+Start it from the repo with:
+
+```bash
+./start_dashboard.sh
+```
+
+The server binds to `127.0.0.1` only. It is for private local monitoring, not a
+public website.

@@ -67,6 +67,14 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 ## Private Dashboard
 
 - Builder script: `/Users/aileansolutions/usefulopsai/scripts/build_dashboard.py`.
+- Localhost-only server: `/Users/aileansolutions/usefulopsai/scripts/dashboard_server.py`.
+- Start command: `cd /Users/aileansolutions/usefulopsai && ./start_dashboard.sh`.
+- Local browser URL: `http://localhost:8766`.
+- Server bind address: `127.0.0.1`; this is intentionally loopback-only and is not public.
+- Local API:
+  - `GET /health`
+  - `GET /api/dashboard`
+  - `POST /api/refresh`
 - Private export paths:
   - HTML: `/Users/aileansolutions/usefulopsai/local/exports/usefulops-dashboard.html`
   - JSON: `/Users/aileansolutions/usefulopsai/local/exports/usefulops-dashboard.json`
@@ -74,6 +82,7 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - 2026-05-30 latest verified snapshot: `dash-20260530T221644Z-e6912040`; gross revenue `$0`, active MRR `$0`, open tasks `0`.
 - The dashboard is a private local file, not a public site or customer portal. Do not publish it because it can include private operating data.
 - 2026-05-30 dashboard expansion: dashboard now includes latest strategy review and recent learning-log entries.
+- 2026-05-30 local server added: dashboard can now be opened at `http://localhost:8766` with a Refresh button that calls `POST /api/refresh` to rebuild from SQLite.
 
 ## Growth Loop
 

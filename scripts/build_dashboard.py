@@ -232,13 +232,16 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>UsefulOps Private Dashboard</title>
     <style>
-      :root {{ --ink:#18202a; --muted:#5b6675; --line:#d8dee7; --paper:#f6f7f9; --panel:#fff; --accent:#0f766e; }}
+      :root {{ --ink:#18202a; --muted:#5b6675; --line:#d8dee7; --paper:#f6f7f9; --panel:#fff; --accent:#0f766e; --accent-strong:#115e59; }}
       * {{ box-sizing: border-box; }}
       body {{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--paper); color:var(--ink); }}
       main {{ width:min(1180px, calc(100% - 40px)); margin:0 auto; padding:36px 0 56px; }}
       header {{ display:flex; justify-content:space-between; gap:24px; align-items:flex-end; margin-bottom:28px; }}
       h1 {{ margin:0; font-size:34px; letter-spacing:0; }}
       .meta {{ color:var(--muted); font-size:14px; }}
+      .controls {{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; }}
+      button {{ appearance:none; border:1px solid var(--accent-strong); background:var(--accent); color:#fff; min-height:40px; padding:0 14px; font:inherit; font-weight:700; cursor:pointer; }}
+      button:disabled {{ opacity:.64; cursor:wait; }}
       .grid {{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; }}
       .card {{ border:1px solid var(--line); background:var(--panel); padding:18px; min-height:104px; }}
       .card span {{ display:block; color:var(--muted); font-size:13px; margin-bottom:12px; }}
@@ -251,7 +254,7 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
       ul {{ margin:0; padding:0; list-style:none; display:grid; gap:12px; }}
       li {{ display:grid; gap:4px; }}
       li span {{ color:var(--muted); line-height:1.45; }}
-      @media (max-width: 880px) {{ .grid {{ grid-template-columns:repeat(2, minmax(0,1fr)); }} header {{ display:block; }} }}
+      @media (max-width: 880px) {{ .grid {{ grid-template-columns:repeat(2, minmax(0,1fr)); }} header {{ display:block; }} .controls {{ align-items:flex-start; margin-top:16px; }} }}
       @media (max-width: 560px) {{ .grid {{ grid-template-columns:1fr; }} }}
     </style>
   </head>
@@ -262,7 +265,10 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
           <h1>UsefulOps Private Dashboard</h1>
           <div class="meta">Snapshot {html.escape(snapshot_id)} at {html.escape(metrics['snapshot_at'])}</div>
         </div>
-        <div class="meta">Local private export. Do not publish.</div>
+        <div class="controls">
+          <button id="refresh-dashboard" type="button">Refresh</button>
+          <div class="meta">Local private export. Do not publish.</div>
+        </div>
       </header>
       <div class="grid">{card_html}</div>
       <section class="section">
@@ -286,6 +292,24 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
         <ul>{action_rows}</ul>
       </section>
     </main>
+    <script>
+      const refreshButton = document.getElementById("refresh-dashboard");
+      refreshButton?.addEventListener("click", async () => {{
+        refreshButton.disabled = true;
+        refreshButton.textContent = "Refreshing";
+        try {{
+          const response = await fetch("/api/refresh", {{ method: "POST" }});
+          if (!response.ok) throw new Error(`Refresh failed: ${{response.status}}`);
+          window.location.reload();
+        }} catch (error) {{
+          refreshButton.textContent = "Refresh failed";
+          window.setTimeout(() => {{
+            refreshButton.disabled = false;
+            refreshButton.textContent = "Refresh";
+          }}, 1800);
+        }}
+      }});
+    </script>
   </body>
 </html>
 """
