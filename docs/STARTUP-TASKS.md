@@ -16,8 +16,7 @@ These are the operating tasks that should remain visible at startup until they a
   - Status: pending
   - Database task: `task-20260529-stripe-api-integration`
   - Decision: use Stripe API/webhooks rather than polling Brian's personal email for payment messages.
-  - Current access: restricted live key stored privately in `local/secrets/stripe.env`; smoke test can read payment links, checkout sessions, and customers.
-  - Remaining access gap: subscription reads currently return HTTP 403, so complete MRR tracking needs subscription read permission added or a separate restricted key with subscription access.
+  - Current access: restricted live key stored privately in `local/secrets/stripe.env`; smoke test can read payment links, checkout sessions, customers, and subscriptions.
   - Later need from Brian: webhook signing secret when the dashboard grows from polling/smoke tests into event-driven sync.
   - Storage rule: no Stripe secret keys in Git, docs, website files, or plaintext committed files.
 
