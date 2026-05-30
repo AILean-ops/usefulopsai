@@ -87,32 +87,31 @@ The database is for internal operating control only. It is not a CRM product, cu
 
 - Helper script: `/Users/aileansolutions/usefulopsai/scripts/operator_loop.py`.
 - Durable tables: `operator_runs` and `operator_checkpoints`.
-- Purpose: make the daily UsefulOps operator loop restartable so a temporary Codex/OpenClaw detached-run failure does not erase the selected task, current step, or next action.
-- Start command:
+- Purpose: make the daily UsefulOps operator loop restartable and locally orchestrated so temporary Codex/OpenClaw detached-run failures do not own or derail the work.
+- Primary run command:
 
 ```bash
 cd /Users/aileansolutions/usefulopsai
-scripts/operator_loop.py start --trigger cron-0915 --objective "Move one high-priority UsefulOps startup item forward."
+scripts/operator_loop.py run --trigger cron-0915 --objective "Move one high-priority UsefulOps startup item forward." --push
 ```
 
-- During work, record progress:
+- Manual dry-run verification command:
 
 ```bash
+scripts/operator_loop.py run --trigger manual-dry-run --objective "Verify local orchestrator path without publishing." --dry-run
+```
+
+- Lower-level checkpoint commands still exist for inspection and recovery:
+
+```bash
+scripts/operator_loop.py start --trigger manual --objective "Move one high-priority UsefulOps startup item forward."
 scripts/operator_loop.py checkpoint --run-id <run_id> --step <step> --summary "<what changed>" --next-action "<next step>"
-```
-
-- On success:
-
-```bash
 scripts/operator_loop.py complete --run-id <run_id> --summary "<result>" --next-action "<next step>"
-```
-
-- On failure:
-
-```bash
 scripts/operator_loop.py fail --run-id <run_id> --error "<error>" --next-action "<recovery step>"
 ```
 
 - Stale protection: `start` marks any `running` operator run older than 30 minutes as `interrupted`, writes a recovery checkpoint, and starts a fresh run linked through `previous_run_id`.
-- Retry guard: OpenClaw cron job `ed7eb2ee-d5a2-40e0-b2e4-7ba807ba94ed` (`UsefulOps daily operator retry guard`) runs daily at `09:45 America/Los_Angeles`. It first calls `scripts/operator_loop.py retry-status`; it only starts real work if the 09:15 run failed, was interrupted, or never recorded a completed daily run. Normal no-retry days use `delivery.mode=none` to avoid chat noise.
-- Smoke test completed 2026-05-30: `start`, `checkpoint`, and `complete` all wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`.
+- Local orchestration: `run` owns start/checkpoint/handler/verification/complete-or-fail. The first deterministic handler replaces the placeholder homepage, runs `npm run build`, updates task state/action log, and commits/pushes only when `--push` is supplied.
+- Bounded Codex use: `run_codex_substep` invokes `codex exec` as a subprocess with a fixed timeout and scoped prompt. It is for planning or narrow future substeps only; detached OpenClaw cron turns should not perform edits or multi-step reasoning themselves.
+- Retry guard: OpenClaw cron job `ed7eb2ee-d5a2-40e0-b2e4-7ba807ba94ed` (`UsefulOps daily operator retry guard`) runs daily at `09:45 America/Los_Angeles`. It first calls `scripts/operator_loop.py retry-status`; it only runs `scripts/operator_loop.py run --trigger cron-0945-retry ... --push` if the 09:15 run failed, was interrupted, or never recorded a completed daily run. Normal no-retry days use `delivery.mode=none` to avoid chat noise.
+- Smoke tests completed 2026-05-30: `start`, `checkpoint`, and `complete` wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`; `scripts/operator_loop.py run --dry-run` selected the website handler, ran `npm run build`, marked the earlier failed manual run interrupted, and completed without publishing.

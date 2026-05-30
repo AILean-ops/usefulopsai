@@ -22,9 +22,9 @@
 
 ## Startup Review
 
-- Start the checkpointed operator loop with `scripts/operator_loop.py start` before doing UsefulOps cron work.
-- Record a checkpoint before and after material edits, verification, external actions, or blockers.
-- Complete or fail the operator run explicitly before sending the progress report.
+- Run the local orchestrator with `scripts/operator_loop.py run` for UsefulOps cron work; do not let detached Codex sessions own the whole loop.
+- Keep Codex use bounded to orchestrator-controlled substeps with explicit timeout, scope, and no external action unless a deterministic handler performs it.
+- Let the orchestrator start, checkpoint, complete, or fail the operator run; do not do that bookkeeping by hand during cron runs.
 - Check pending high-priority tasks in the local database.
 - Keep `docs/STARTUP-TASKS.md` aligned with any durable startup tasks Brian should know about.
 - Move the UsefulOps AI launch website forward until the public placeholder is replaced.
