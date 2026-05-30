@@ -90,7 +90,16 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
         "active_clients": scalar(conn, "SELECT COUNT(*) FROM clients WHERE status = 'active'"),
         "open_deliverables": scalar(conn, "SELECT COUNT(*) FROM deliverables WHERE status NOT IN ('delivered', 'cancelled')"),
         "open_tasks": scalar(conn, "SELECT COUNT(*) FROM tasks WHERE status IN ('pending', 'in_progress')"),
-        "payment_links": rows(conn, "SELECT name, amount_cents, billing_type, status FROM payment_links ORDER BY amount_cents"),
+        "payment_links": rows(
+            conn,
+            """
+            SELECT name, amount_cents, billing_type, status
+            FROM payment_links
+            WHERE status = 'active'
+              AND amount_cents > 0
+            ORDER BY amount_cents
+            """,
+        ),
         "tasks": rows(conn, "SELECT title, status, priority, updated_at FROM tasks ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END, updated_at DESC LIMIT 8"),
         "recent_actions": rows(conn, "SELECT action_at, action_type, summary FROM action_log ORDER BY action_at DESC LIMIT 10"),
         "latest_stripe_sync": dict(latest_sync) if latest_sync else None,

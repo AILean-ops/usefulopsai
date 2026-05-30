@@ -117,6 +117,19 @@ def sync_payment_links(conn: sqlite3.Connection, links: list[dict[str, Any]]) ->
                 recurring = data[0].get("price", {}).get("recurring")
                 billing_type = "monthly_subscription" if recurring else "one_time"
         name = link.get("metadata", {}).get("name") or link.get("id")
+        existing = conn.execute(
+            """
+            SELECT id
+            FROM payment_links
+            WHERE stripe_url = ?
+            ORDER BY
+              CASE WHEN amount_cents > 0 AND id NOT LIKE 'plink_%' THEN 0 ELSE 1 END,
+              updated_at DESC
+            LIMIT 1
+            """,
+            (url,),
+        ).fetchone()
+        target_id = existing["id"] if existing else link_id
         conn.execute(
             """
             INSERT INTO payment_links (
@@ -132,7 +145,7 @@ def sync_payment_links(conn: sqlite3.Connection, links: list[dict[str, Any]]) ->
               updated_at = excluded.updated_at
             """,
             (
-                link_id,
+                target_id,
                 name,
                 url,
                 amount_cents,
@@ -141,6 +154,25 @@ def sync_payment_links(conn: sqlite3.Connection, links: list[dict[str, Any]]) ->
                 now,
             ),
         )
+        if target_id != link_id:
+            conn.execute(
+                "DELETE FROM payment_links WHERE id = ? AND stripe_url = ? AND amount_cents = 0",
+                (link_id, url),
+            )
+    conn.execute(
+        """
+        DELETE FROM payment_links
+        WHERE id LIKE 'plink_%'
+          AND amount_cents = 0
+          AND EXISTS (
+            SELECT 1
+            FROM payment_links named
+            WHERE named.stripe_url = payment_links.stripe_url
+              AND named.id != payment_links.id
+              AND named.amount_cents > 0
+          )
+        """
+    )
 
 
 def sync_revenue(conn: sqlite3.Connection, sessions: list[dict[str, Any]]) -> int:
