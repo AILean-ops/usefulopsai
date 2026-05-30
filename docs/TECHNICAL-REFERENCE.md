@@ -80,6 +80,14 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - Prep script: `/Users/aileansolutions/usefulopsai/scripts/prepare_outreach.py`.
 - 2026-05-30 result: seeded five named public-prospect records with public URLs, operating hypotheses, offer fit, and next actions. They are research-ready only; no emails were sent and no contacts were created.
 - Prospect records use `status='qualified_research_ready'` and still require final public contact-page verification, suppression checks, and draft quality review before any outreach.
+- Prospecting pipeline script: `/Users/aileansolutions/usefulopsai/scripts/prospecting_pipeline.py`.
+- 2026-05-30 prospecting-ready result: pipeline seeded 12 named public prospects, created 12 public-source contact records, checked suppressions, and created 12 unsent `outreach_actions` draft rows. No emails were sent and no Gmail drafts were created.
+- Suppression CLI examples:
+
+```bash
+scripts/prospecting_pipeline.py check-suppression --email info@example.com
+scripts/prospecting_pipeline.py suppress --email info@example.com --reason "Unsubscribed or do-not-contact request"
+```
 
 ## Database Purpose
 

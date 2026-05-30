@@ -257,7 +257,9 @@ CREATE TABLE IF NOT EXISTS operator_checkpoints (
 CREATE INDEX IF NOT EXISTS idx_prospects_status ON prospects(status);
 CREATE INDEX IF NOT EXISTS idx_prospects_approval_state ON prospects(approval_state);
 CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_contacts_prospect_email ON contacts(prospect_id, email) WHERE email IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_outreach_status ON outreach_actions(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_outreach_initial_email_prospect ON outreach_actions(prospect_id, action_type, channel) WHERE action_type = 'cold_initial' AND channel = 'email';
 CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
 CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_revenue_external_id ON revenue(external_id) WHERE external_id IS NOT NULL;

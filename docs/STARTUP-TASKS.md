@@ -45,6 +45,12 @@ These are the operating tasks that should remain visible at startup until they a
   - Database task: `task-20260530-first-prospect-batch`
   - Result: five named public-prospect records were seeded in SQLite with public-source URLs, operating hypotheses, offer fit, and next actions. They are research-ready, not send-ready.
 
+- **Prepare UsefulOps real-world prospecting queue through draft outreach**
+  - Status: completed 2026-05-30
+  - Database task: `task-20260530-prospecting-ready`
+  - Result: `scripts/prospecting_pipeline.py` seeded 12 named public prospects, created public-source contact records, checked suppressions, and generated 12 unsent initial outreach drafts in `outreach_actions`.
+  - Boundary: no emails were sent and no Gmail drafts were created. Next external step is an explicit send/draft-mailbox decision.
+
 ## Recorded Partnership Terms
 
 - Friendly competition: first business to reach `$14k MRR` gets one year of bragging rights.

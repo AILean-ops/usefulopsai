@@ -619,6 +619,8 @@ def next_action_for(task: sqlite3.Row | None, site_state: dict[str, Any]) -> str
         return "Prepare outreach compliance and suppression guardrails before prospecting."
     if "prospect" in title:
         return "Prepare a small qualified prospect batch with concrete reasons for contact."
+    if "outreach" in title:
+        return "Seed, research, and draft prospect outreach without sending."
     return f"Move selected task forward: {task['title']}"
 
 
@@ -1109,6 +1111,21 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
                 run_id,
                 "UsefulOps outreach compliance and prospect-prep records completed by the local orchestrator.",
                 "Continue with public research into named prospects before any outreach.",
+            )
+        elif task and "outreach" in task["title"].lower():
+            result = run_local_script_step(
+                conn,
+                run_id,
+                task,
+                "prospecting_pipeline",
+                ["zsh", "-lc", "scripts/prospecting_pipeline.py seed && scripts/prospecting_pipeline.py research && scripts/prospecting_pipeline.py draft && scripts/prospecting_pipeline.py summary"],
+                dry_run=dry_run,
+            )
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps prospecting pipeline prepared send-ready draft records without sending.",
+                "Review draft outreach rows and explicitly send when appropriate.",
             )
         else:
             result = run_codex_planning_step(conn, run_id, task, dry_run=dry_run)
