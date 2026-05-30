@@ -20,6 +20,13 @@
 - Confirm payment path.
 - Log planned spend.
 
+## Startup Review
+
+- Check pending high-priority tasks in the local database.
+- Keep `docs/STARTUP-TASKS.md` aligned with any durable startup tasks Brian should know about.
+- Prioritize the UsefulOps AI operating dashboard until Brian has a reliable view of progress.
+- Prefer direct Stripe API/webhook revenue tracking over polling Brian's personal inbox.
+
 ## Before Any Client Delivery
 
 - Confirm scope.
@@ -32,4 +39,3 @@
 ## Kill Switch
 
 If Brian says `Sauron business freeze`, stop all UsefulOps AI outreach, spend, external replies, autonomous tasks, and non-essential sandbox actions until Brian explicitly resumes.
-

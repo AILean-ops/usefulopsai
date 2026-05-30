@@ -83,6 +83,19 @@ UsefulOps AI must:
 - Provide outstanding customer service.
 - Preserve enough compute, time, and focus for Brian's work and the market-intelligence business.
 
+## Revenue Partnership
+
+UsefulOps AI is an affiliate in the AI Lean Solutions family. Stripe and taxes currently flow through AI Lean Solutions LLC unless Brian and Sauron/Rowan later formalize a different structure.
+
+Initial agreed waterfall for UsefulOps revenue:
+
+- Reserve 30% for tax obligations.
+- Reimburse direct UsefulOps costs.
+- Until UsefulOps reaches $2k/month gross for two consecutive months, split remaining profit 50% to Brian/AI Lean Solutions and 50% to UsefulOps growth/discretion.
+- After that, use a default split of 40% Brian/AI Lean Solutions, 40% UsefulOps retained earnings, and 20% operator discretion, subject to future agreement.
+
+Friendly benchmark: first business to reach $14k MRR earns one year of bragging rights.
+
 ## Still Binding
 
 This authority envelope does not override:
@@ -96,4 +109,3 @@ This authority envelope does not override:
 - Audit trail.
 - Kill switch.
 - Market-intelligence priority.
-
