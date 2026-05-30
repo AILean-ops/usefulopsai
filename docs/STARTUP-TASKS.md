@@ -51,6 +51,13 @@ These are the operating tasks that should remain visible at startup until they a
   - Result: `scripts/prospecting_pipeline.py` seeded 12 named public prospects, created public-source contact records, checked suppressions, and generated 12 unsent initial outreach drafts in `outreach_actions`.
   - Boundary: no emails were sent and no Gmail drafts were created. Next external step is an explicit send/draft-mailbox decision.
 
+- **Execute first controlled outreach batch**
+  - Status: pending
+  - Database task: `task-growth-loop-next-action`
+  - Source: automatic strategy review `strategy-review-20260530T225139Z-de38bfe1`
+  - Diagnosis: execution gap. UsefulOps has 12 prepared drafts and 0 sends.
+  - Next action: send or create mailbox drafts for the first 12 prepared outreach records, then run strategy review after responses have time to arrive.
+
 ## Recorded Partnership Terms
 
 - Friendly competition: first business to reach `$14k MRR` gets one year of bragging rights.

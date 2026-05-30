@@ -70,6 +70,73 @@ CREATE TABLE IF NOT EXISTS outreach_actions (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS growth_batches (
+  id TEXT PRIMARY KEY,
+  experiment_id TEXT REFERENCES experiments(id),
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft',
+  hypothesis TEXT NOT NULL,
+  target_niche TEXT,
+  target_location TEXT,
+  offer_angle TEXT,
+  subject_pattern TEXT,
+  cta TEXT,
+  planned_count INTEGER NOT NULL DEFAULT 0,
+  sent_count INTEGER NOT NULL DEFAULT 0,
+  reply_count INTEGER NOT NULL DEFAULT 0,
+  positive_reply_count INTEGER NOT NULL DEFAULT 0,
+  opt_out_count INTEGER NOT NULL DEFAULT 0,
+  booked_count INTEGER NOT NULL DEFAULT 0,
+  paid_count INTEGER NOT NULL DEFAULT 0,
+  revenue_cents INTEGER NOT NULL DEFAULT 0,
+  started_at TEXT,
+  ended_at TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS growth_batch_items (
+  id TEXT PRIMARY KEY,
+  batch_id TEXT NOT NULL REFERENCES growth_batches(id),
+  prospect_id TEXT NOT NULL REFERENCES prospects(id),
+  outreach_action_id TEXT REFERENCES outreach_actions(id),
+  status TEXT NOT NULL DEFAULT 'planned',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS strategy_reviews (
+  id TEXT PRIMARY KEY,
+  reviewed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  scope TEXT NOT NULL DEFAULT 'daily',
+  sends INTEGER NOT NULL DEFAULT 0,
+  drafts INTEGER NOT NULL DEFAULT 0,
+  replies INTEGER NOT NULL DEFAULT 0,
+  positive_replies INTEGER NOT NULL DEFAULT 0,
+  opt_outs INTEGER NOT NULL DEFAULT 0,
+  booked INTEGER NOT NULL DEFAULT 0,
+  paid INTEGER NOT NULL DEFAULT 0,
+  revenue_cents INTEGER NOT NULL DEFAULT 0,
+  diagnosis TEXT NOT NULL,
+  recommendation TEXT NOT NULL,
+  next_action TEXT NOT NULL,
+  metrics_json TEXT NOT NULL DEFAULT '{}'
+);
+
+CREATE TABLE IF NOT EXISTS learning_log (
+  id TEXT PRIMARY KEY,
+  learned_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  source_type TEXT NOT NULL,
+  source_id TEXT,
+  lesson_type TEXT NOT NULL,
+  finding TEXT NOT NULL,
+  decision TEXT NOT NULL,
+  confidence TEXT NOT NULL DEFAULT 'low',
+  applies_to TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS suppressions (
   id TEXT PRIMARY KEY,
   email TEXT,
@@ -260,6 +327,10 @@ CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_contacts_prospect_email ON contacts(prospect_id, email) WHERE email IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_outreach_status ON outreach_actions(status);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_outreach_initial_email_prospect ON outreach_actions(prospect_id, action_type, channel) WHERE action_type = 'cold_initial' AND channel = 'email';
+CREATE INDEX IF NOT EXISTS idx_growth_batches_status ON growth_batches(status);
+CREATE INDEX IF NOT EXISTS idx_growth_batch_items_batch_id ON growth_batch_items(batch_id);
+CREATE INDEX IF NOT EXISTS idx_strategy_reviews_reviewed_at ON strategy_reviews(reviewed_at);
+CREATE INDEX IF NOT EXISTS idx_learning_log_learned_at ON learning_log(learned_at);
 CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
 CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_revenue_external_id ON revenue(external_id) WHERE external_id IS NOT NULL;

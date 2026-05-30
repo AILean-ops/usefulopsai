@@ -94,6 +94,24 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
         "tasks": rows(conn, "SELECT title, status, priority, updated_at FROM tasks ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END, updated_at DESC LIMIT 8"),
         "recent_actions": rows(conn, "SELECT action_at, action_type, summary FROM action_log ORDER BY action_at DESC LIMIT 10"),
         "latest_stripe_sync": dict(latest_sync) if latest_sync else None,
+        "latest_strategy_review": rows(
+            conn,
+            """
+            SELECT reviewed_at, diagnosis, recommendation, next_action
+            FROM strategy_reviews
+            ORDER BY reviewed_at DESC
+            LIMIT 1
+            """,
+        ),
+        "recent_learnings": rows(
+            conn,
+            """
+            SELECT learned_at, lesson_type, finding, decision, confidence
+            FROM learning_log
+            ORDER BY learned_at DESC
+            LIMIT 5
+            """,
+        ),
     }
     return metrics
 
@@ -191,6 +209,18 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
         f"<li><strong>{html.escape(row['action_type'])}</strong><span>{html.escape(row['summary'])}</span></li>"
         for row in metrics["recent_actions"]
     )
+    learning_rows = "\n".join(
+        f"<li><strong>{html.escape(row['lesson_type'])}</strong><span>{html.escape(row['decision'])}</span></li>"
+        for row in metrics["recent_learnings"]
+    )
+    review = metrics["latest_strategy_review"][0] if metrics["latest_strategy_review"] else None
+    review_html = (
+        f"<p><strong>Diagnosis:</strong> {html.escape(review['diagnosis'])}</p>"
+        f"<p><strong>Recommendation:</strong> {html.escape(review['recommendation'])}</p>"
+        f"<p><strong>Next action:</strong> {html.escape(review['next_action'])}</p>"
+        if review
+        else "<p>No strategy review recorded yet.</p>"
+    )
     link_rows = "\n".join(
         f"<tr><td>{html.escape(row['name'])}</td><td>{money(int(row['amount_cents'] or 0))}</td><td>{html.escape(row['billing_type'])}</td><td>{html.escape(row['status'])}</td></tr>"
         for row in metrics["payment_links"]
@@ -242,6 +272,14 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
       <section class="section">
         <h2>Tasks</h2>
         <table><thead><tr><th>Task</th><th>Status</th><th>Priority</th></tr></thead><tbody>{task_rows}</tbody></table>
+      </section>
+      <section class="section">
+        <h2>Strategy Review</h2>
+        {review_html}
+      </section>
+      <section class="section">
+        <h2>Learning Log</h2>
+        <ul>{learning_rows}</ul>
       </section>
       <section class="section">
         <h2>Recent Action Log</h2>

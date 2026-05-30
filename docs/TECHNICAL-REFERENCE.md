@@ -73,6 +73,16 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - Snapshot table: `dashboard_snapshots`.
 - 2026-05-30 latest verified snapshot: `dash-20260530T221644Z-e6912040`; gross revenue `$0`, active MRR `$0`, open tasks `0`.
 - The dashboard is a private local file, not a public site or customer portal. Do not publish it because it can include private operating data.
+- 2026-05-30 dashboard expansion: dashboard now includes latest strategy review and recent learning-log entries.
+
+## Growth Loop
+
+- Operating doc: `/Users/aileansolutions/usefulopsai/docs/GROWTH-LOOP.md`.
+- Review script: `/Users/aileansolutions/usefulopsai/scripts/strategy_review.py`.
+- Durable tables: `growth_batches`, `growth_batch_items`, `strategy_reviews`, and `learning_log`.
+- Purpose: automatically measure the funnel, diagnose the current bottleneck, record a lesson, and queue the next concrete high-priority task.
+- Diagnoses currently encoded: `execution_gap`, `message_or_list_gap`, `offer_gap`, `conversion_gap`, and `scale_winners`.
+- 2026-05-30 first review: `strategy-review-20260530T225139Z-de38bfe1` diagnosed an `execution_gap` because UsefulOps had 12 draft outreach rows and 0 sends. It queued task `task-growth-loop-next-action` titled `Execute first controlled outreach batch`. No emails were sent.
 
 ## Outreach Prep
 
@@ -142,6 +152,7 @@ scripts/operator_loop.py fail --run-id <run_id> --error "<error>" --next-action 
 - Stale protection: `start` marks any `running` operator run older than 30 minutes as `interrupted`, writes a recovery checkpoint, and starts a fresh run linked through `previous_run_id`.
 - Local orchestration: `run` owns start/checkpoint/handler/verification/complete-or-fail. The first deterministic handler replaces the placeholder homepage, runs `npm run build`, updates task state/action log, and commits/pushes only when `--push` is supplied.
 - 2026-05-30 handler expansion: `run` now has deterministic local handlers for dashboard build, Stripe sync, outreach compliance, and prospect prep. These call `scripts/build_dashboard.py`, `scripts/stripe_sync.py`, and `scripts/prepare_outreach.py` rather than asking a detached Codex turn to perform multi-step work.
+- 2026-05-30 strategy handler: `run` can call `scripts/strategy_review.py` for explicit strategy/growth-loop tasks. Strategy review is internal only; it does not send outreach.
 - Bounded Codex use: `run_codex_substep` invokes `codex exec` as a subprocess with a fixed timeout and scoped prompt. It is for planning or narrow future substeps only; detached OpenClaw cron turns should not perform edits or multi-step reasoning themselves.
 - Retry guard: OpenClaw cron job `ed7eb2ee-d5a2-40e0-b2e4-7ba807ba94ed` (`UsefulOps daily operator retry guard`) runs daily at `09:45 America/Los_Angeles`. It first calls `scripts/operator_loop.py retry-status`; it only runs `scripts/operator_loop.py run --trigger cron-0945-retry ... --push` if the 09:15 run failed, was interrupted, or never recorded a completed daily run. Normal no-retry days use `delivery.mode=none` to avoid chat noise.
 - Smoke tests completed 2026-05-30: `start`, `checkpoint`, and `complete` wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`; `scripts/operator_loop.py run --dry-run` selected the website handler, ran `npm run build`, marked the earlier failed manual run interrupted, and completed without publishing.

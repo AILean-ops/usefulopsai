@@ -621,6 +621,8 @@ def next_action_for(task: sqlite3.Row | None, site_state: dict[str, Any]) -> str
         return "Prepare a small qualified prospect batch with concrete reasons for contact."
     if "outreach" in title:
         return "Seed, research, and draft prospect outreach without sending."
+    if "growth loop" in title or "strategy" in title:
+        return "Run strategy review, record learnings, and queue the next highest-leverage action."
     return f"Move selected task forward: {task['title']}"
 
 
@@ -1111,6 +1113,21 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
                 run_id,
                 "UsefulOps outreach compliance and prospect-prep records completed by the local orchestrator.",
                 "Continue with public research into named prospects before any outreach.",
+            )
+        elif task and ("growth loop" in task["title"].lower() or "strategy" in task["title"].lower()):
+            result = run_local_script_step(
+                conn,
+                run_id,
+                task,
+                "strategy_review",
+                ["python3", "scripts/strategy_review.py"],
+                dry_run=dry_run,
+            )
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps strategy review completed and next growth action was queued.",
+                "Execute the queued growth-loop next action, then review results.",
             )
         elif task and "outreach" in task["title"].lower():
             result = run_local_script_step(
