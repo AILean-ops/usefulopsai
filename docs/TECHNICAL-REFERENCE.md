@@ -17,6 +17,7 @@
 - Gmail smoke test returned the Google Workspace welcome email.
 - Drive smoke test completed successfully and returned no files.
 - Setup guide: `/Users/aileansolutions/usefulopsai/docs/GOG-SETUP.md`.
+- Current authority envelope: `/Users/aileansolutions/usefulopsai/docs/AUTHORITY-ENVELOPE.md`.
 
 The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machine because GitHub SSH access is configured through the `github-workspace` host alias.
 
