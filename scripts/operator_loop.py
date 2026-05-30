@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
 WEBSITE_INDEX = ROOT / "website" / "index.html"
 STALE_MINUTES = 30
+DAILY_RETRY_TRIGGER = "cron-0945-retry"
+PRIMARY_DAILY_TRIGGER = "cron-0915"
 
 
 def utc_now() -> str:
@@ -355,6 +357,52 @@ def build_status(conn: sqlite3.Connection, run_id: str | None = None) -> dict[st
     }
 
 
+def retry_status(conn: sqlite3.Connection) -> dict[str, Any]:
+    """Return whether the 09:45 retry guard should do real work today."""
+    ensure_schema(conn)
+    stale = mark_stale_runs(conn)
+    today = datetime.now(timezone.utc).date().isoformat()
+    todays_runs = conn.execute(
+        """
+        SELECT *
+        FROM operator_runs
+        WHERE date(started_at) = date(?)
+          AND trigger_source IN (?, ?)
+        ORDER BY started_at DESC
+        """,
+        (today, PRIMARY_DAILY_TRIGGER, DAILY_RETRY_TRIGGER),
+    ).fetchall()
+    latest = todays_runs[0] if todays_runs else None
+    completed = [row for row in todays_runs if row["status"] == "completed"]
+    failed_or_interrupted = [
+        row for row in todays_runs if row["status"] in ("failed", "interrupted")
+    ]
+    running = [row for row in todays_runs if row["status"] == "running"]
+
+    should_retry = False
+    reason = "No retry needed."
+    if completed:
+        reason = "A daily UsefulOps operator run already completed today."
+    elif failed_or_interrupted:
+        should_retry = True
+        reason = "A daily UsefulOps operator run failed or was interrupted today."
+    elif running:
+        should_retry = False
+        reason = "A daily UsefulOps operator run is still active; wait for stale-run recovery."
+    else:
+        should_retry = True
+        reason = "No primary daily UsefulOps operator run is recorded today."
+
+    conn.commit()
+    return {
+        "should_retry": should_retry,
+        "reason": reason,
+        "stale_runs_marked_interrupted": [row["id"] for row in stale],
+        "latest_daily_run": row_to_dict(latest),
+        "daily_runs_today": [dict(row) for row in todays_runs],
+    }
+
+
 def print_json(value: dict[str, Any]) -> None:
     print(json.dumps(value, indent=2, sort_keys=True))
 
@@ -365,6 +413,7 @@ def main() -> int:
 
     sub.add_parser("init")
     sub.add_parser("status")
+    sub.add_parser("retry-status")
 
     start = sub.add_parser("start")
     start.add_argument("--trigger", default="manual")
@@ -394,6 +443,8 @@ def main() -> int:
             print_json(build_status(conn))
         elif args.command == "status":
             print_json(build_status(conn))
+        elif args.command == "retry-status":
+            print_json(retry_status(conn))
         elif args.command == "start":
             print_json(start_run(conn, args.trigger, args.objective))
         elif args.command == "checkpoint":

@@ -114,4 +114,5 @@ scripts/operator_loop.py fail --run-id <run_id> --error "<error>" --next-action 
 ```
 
 - Stale protection: `start` marks any `running` operator run older than 30 minutes as `interrupted`, writes a recovery checkpoint, and starts a fresh run linked through `previous_run_id`.
+- Retry guard: OpenClaw cron job `ed7eb2ee-d5a2-40e0-b2e4-7ba807ba94ed` (`UsefulOps daily operator retry guard`) runs daily at `09:45 America/Los_Angeles`. It first calls `scripts/operator_loop.py retry-status`; it only starts real work if the 09:15 run failed, was interrupted, or never recorded a completed daily run. Normal no-retry days use `delivery.mode=none` to avoid chat noise.
 - Smoke test completed 2026-05-30: `start`, `checkpoint`, and `complete` all wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`.
