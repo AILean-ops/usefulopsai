@@ -136,6 +136,19 @@ CREATE TABLE IF NOT EXISTS revenue (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS stripe_sync_runs (
+  id TEXT PRIMARY KEY,
+  synced_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status TEXT NOT NULL,
+  payment_links_seen INTEGER NOT NULL DEFAULT 0,
+  checkout_sessions_seen INTEGER NOT NULL DEFAULT 0,
+  subscriptions_seen INTEGER NOT NULL DEFAULT 0,
+  gross_revenue_cents INTEGER NOT NULL DEFAULT 0,
+  active_mrr_cents INTEGER NOT NULL DEFAULT 0,
+  summary_json TEXT NOT NULL DEFAULT '{}',
+  error TEXT
+);
+
 CREATE TABLE IF NOT EXISTS payment_links (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -162,6 +175,25 @@ CREATE TABLE IF NOT EXISTS expenses (
   recurring_interval TEXT,
   notes TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS dashboard_snapshots (
+  id TEXT PRIMARY KEY,
+  snapshot_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  gross_revenue_cents INTEGER NOT NULL DEFAULT 0,
+  active_mrr_cents INTEGER NOT NULL DEFAULT 0,
+  tax_reserve_cents INTEGER NOT NULL DEFAULT 0,
+  brian_share_cents INTEGER NOT NULL DEFAULT 0,
+  usefulops_growth_cents INTEGER NOT NULL DEFAULT 0,
+  operator_discretion_cents INTEGER NOT NULL DEFAULT 0,
+  budget_used_cents INTEGER NOT NULL DEFAULT 0,
+  active_prospects INTEGER NOT NULL DEFAULT 0,
+  cold_contacts_sent INTEGER NOT NULL DEFAULT 0,
+  replies INTEGER NOT NULL DEFAULT 0,
+  active_clients INTEGER NOT NULL DEFAULT 0,
+  open_deliverables INTEGER NOT NULL DEFAULT 0,
+  open_tasks INTEGER NOT NULL DEFAULT 0,
+  metrics_json TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE TABLE IF NOT EXISTS tasks (
@@ -228,6 +260,9 @@ CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
 CREATE INDEX IF NOT EXISTS idx_outreach_status ON outreach_actions(status);
 CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
 CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_revenue_external_id ON revenue(external_id) WHERE external_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_stripe_sync_runs_synced_at ON stripe_sync_runs(synced_at);
+CREATE INDEX IF NOT EXISTS idx_dashboard_snapshots_snapshot_at ON dashboard_snapshots(snapshot_at);
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
 CREATE INDEX IF NOT EXISTS idx_action_log_action_at ON action_log(action_at);
 CREATE INDEX IF NOT EXISTS idx_operator_runs_status ON operator_runs(status);

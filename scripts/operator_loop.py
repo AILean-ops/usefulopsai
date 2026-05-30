@@ -615,6 +615,10 @@ def next_action_for(task: sqlite3.Row | None, site_state: dict[str, Any]) -> str
         return "Build the first Brian-viewable dashboard from local SQLite data without exposing secrets."
     if "stripe" in title:
         return "Add Stripe revenue/MRR sync using the private restricted key without committing secrets."
+    if "compliance" in title:
+        return "Prepare outreach compliance and suppression guardrails before prospecting."
+    if "prospect" in title:
+        return "Prepare a small qualified prospect batch with concrete reasons for contact."
     return f"Move selected task forward: {task['title']}"
 
 
@@ -969,6 +973,47 @@ def run_website_launch_step(conn: sqlite3.Connection, run_id: str, task: sqlite3
     }
 
 
+def run_local_script_step(
+    conn: sqlite3.Connection,
+    run_id: str,
+    task: sqlite3.Row,
+    handler: str,
+    command: list[str],
+    dry_run: bool,
+) -> dict[str, Any]:
+    checkpoint(
+        conn,
+        run_id,
+        f"{handler}_started",
+        f"Local orchestrator selected the bounded {handler} handler.",
+        "Run the local script and verify its JSON result.",
+        "running",
+    )
+    if dry_run:
+        return {
+            "handler": handler,
+            "dry_run": True,
+            "command": command,
+            "task_id": task["id"],
+        }
+    result = run_command(command, timeout=180)
+    require_success(result, handler)
+    checkpoint(
+        conn,
+        run_id,
+        f"{handler}_completed",
+        f"Bounded {handler} handler completed successfully.",
+        "Complete operator run and continue with next queued task.",
+        "running",
+    )
+    return {
+        "handler": handler,
+        "dry_run": False,
+        "task_id": task["id"],
+        "result": command_summary(result),
+    }
+
+
 def run_codex_planning_step(conn: sqlite3.Connection, run_id: str, task: sqlite3.Row | None, dry_run: bool) -> dict[str, Any]:
     title = task["title"] if task else "No selected task"
     prompt = f"""You are running a bounded UsefulOps AI planning substep.
@@ -1019,6 +1064,51 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
                 run_id,
                 summary,
                 "Continue with the next high-priority UsefulOps task on the next daily run.",
+            )
+        elif task and "dashboard" in task["title"].lower():
+            result = run_local_script_step(
+                conn,
+                run_id,
+                task,
+                "dashboard_build",
+                ["python3", "scripts/build_dashboard.py"],
+                dry_run=dry_run,
+            )
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps private dashboard build completed by the local orchestrator.",
+                "Continue with Stripe sync or the next high-priority UsefulOps task.",
+            )
+        elif task and "stripe" in task["title"].lower():
+            result = run_local_script_step(
+                conn,
+                run_id,
+                task,
+                "stripe_sync",
+                ["python3", "scripts/stripe_sync.py"],
+                dry_run=dry_run,
+            )
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps Stripe revenue/MRR sync completed by the local orchestrator.",
+                "Continue with outreach compliance or the next high-priority UsefulOps task.",
+            )
+        elif task and ("compliance" in task["title"].lower() or "prospect" in task["title"].lower()):
+            result = run_local_script_step(
+                conn,
+                run_id,
+                task,
+                "outreach_prepare",
+                ["python3", "scripts/prepare_outreach.py"],
+                dry_run=dry_run,
+            )
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps outreach compliance and prospect-prep records completed by the local orchestrator.",
+                "Continue with public research into named prospects before any outreach.",
             )
         else:
             result = run_codex_planning_step(conn, run_id, task, dry_run=dry_run)

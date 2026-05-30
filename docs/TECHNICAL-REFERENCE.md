@@ -61,6 +61,25 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - Local Stripe secret storage: `/Users/aileansolutions/usefulopsai/local/secrets/stripe.env`, ignored by Git.
 - Smoke-test script: `/Users/aileansolutions/usefulopsai/scripts/stripe_smoke_test.py`.
 - 2026-05-29 restricted-key verification: `payment_links`, `checkout_sessions`, `customers`, and `subscriptions` are readable. This is enough for the first dashboard revenue/MRR sync.
+- Stripe sync script: `/Users/aileansolutions/usefulopsai/scripts/stripe_sync.py`.
+- 2026-05-30 sync result: read-only sync completed with 3 payment links, 1 checkout session, 0 subscriptions, 0 paid revenue rows, and 0 active MRR. Sync history is stored in SQLite table `stripe_sync_runs`; paid checkout sessions are inserted into `revenue` by external session id.
+
+## Private Dashboard
+
+- Builder script: `/Users/aileansolutions/usefulopsai/scripts/build_dashboard.py`.
+- Private export paths:
+  - HTML: `/Users/aileansolutions/usefulopsai/local/exports/usefulops-dashboard.html`
+  - JSON: `/Users/aileansolutions/usefulopsai/local/exports/usefulops-dashboard.json`
+- Snapshot table: `dashboard_snapshots`.
+- 2026-05-30 latest verified snapshot: `dash-20260530T221644Z-e6912040`; gross revenue `$0`, active MRR `$0`, open tasks `0`.
+- The dashboard is a private local file, not a public site or customer portal. Do not publish it because it can include private operating data.
+
+## Outreach Prep
+
+- Compliance checklist: `/Users/aileansolutions/usefulopsai/docs/OUTREACH-COMPLIANCE.md`.
+- Prep script: `/Users/aileansolutions/usefulopsai/scripts/prepare_outreach.py`.
+- 2026-05-30 result: seeded five named public-prospect records with public URLs, operating hypotheses, offer fit, and next actions. They are research-ready only; no emails were sent and no contacts were created.
+- Prospect records use `status='qualified_research_ready'` and still require final public contact-page verification, suppression checks, and draft quality review before any outreach.
 
 ## Database Purpose
 
@@ -77,6 +96,8 @@ The initial SQLite database tracks:
 - Revenue
 - Payment links
 - Expenses
+- Stripe sync runs
+- Dashboard snapshots
 - Tasks
 - Real-world action log
 - Checkpointed operator runs and checkpoints
@@ -112,6 +133,7 @@ scripts/operator_loop.py fail --run-id <run_id> --error "<error>" --next-action 
 
 - Stale protection: `start` marks any `running` operator run older than 30 minutes as `interrupted`, writes a recovery checkpoint, and starts a fresh run linked through `previous_run_id`.
 - Local orchestration: `run` owns start/checkpoint/handler/verification/complete-or-fail. The first deterministic handler replaces the placeholder homepage, runs `npm run build`, updates task state/action log, and commits/pushes only when `--push` is supplied.
+- 2026-05-30 handler expansion: `run` now has deterministic local handlers for dashboard build, Stripe sync, outreach compliance, and prospect prep. These call `scripts/build_dashboard.py`, `scripts/stripe_sync.py`, and `scripts/prepare_outreach.py` rather than asking a detached Codex turn to perform multi-step work.
 - Bounded Codex use: `run_codex_substep` invokes `codex exec` as a subprocess with a fixed timeout and scoped prompt. It is for planning or narrow future substeps only; detached OpenClaw cron turns should not perform edits or multi-step reasoning themselves.
 - Retry guard: OpenClaw cron job `ed7eb2ee-d5a2-40e0-b2e4-7ba807ba94ed` (`UsefulOps daily operator retry guard`) runs daily at `09:45 America/Los_Angeles`. It first calls `scripts/operator_loop.py retry-status`; it only runs `scripts/operator_loop.py run --trigger cron-0945-retry ... --push` if the 09:15 run failed, was interrupted, or never recorded a completed daily run. Normal no-retry days use `delivery.mode=none` to avoid chat noise.
 - Smoke tests completed 2026-05-30: `start`, `checkpoint`, and `complete` wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`; `scripts/operator_loop.py run --dry-run` selected the website handler, ran `npm run build`, marked the earlier failed manual run interrupted, and completed without publishing.
