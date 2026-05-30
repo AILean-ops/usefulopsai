@@ -4,6 +4,14 @@ These are the operating tasks that should remain visible at startup until they a
 
 ## High Priority
 
+- **Replace UsefulOps AI placeholder website with launch site**
+  - Status: pending
+  - Database task: `task-20260529-website-launch-build`
+  - Goal: turn the live placeholder at `https://usefulopsai.com/` into a credible launch site for UsefulOps AI.
+  - Initial scope: practical small-business AI workflow positioning, audit/sprint/support offers, clear boundaries, payment-link CTA path, privacy-friendly contact path, and non-weird Rowan Vale identity.
+  - Guardrails: do not publish misleading claims, fake customer proof, guaranteed outcomes, unsupported compliance promises, or Sauron/internal persona references.
+  - Cron rule: daily UsefulOps operator loop should move this forward until the placeholder is replaced.
+
 - **Build UsefulOps AI operating dashboard**
   - Status: pending
   - Database task: `task-20260529-usefulops-dashboard`

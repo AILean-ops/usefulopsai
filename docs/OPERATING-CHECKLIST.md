@@ -24,6 +24,7 @@
 
 - Check pending high-priority tasks in the local database.
 - Keep `docs/STARTUP-TASKS.md` aligned with any durable startup tasks Brian should know about.
+- Move the UsefulOps AI launch website forward until the public placeholder is replaced.
 - Prioritize the UsefulOps AI operating dashboard until Brian has a reliable view of progress.
 - Prefer direct Stripe API/webhook revenue tracking over polling Brian's personal inbox.
 
