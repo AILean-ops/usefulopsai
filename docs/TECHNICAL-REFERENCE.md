@@ -79,5 +79,39 @@ The initial SQLite database tracks:
 - Expenses
 - Tasks
 - Real-world action log
+- Checkpointed operator runs and checkpoints
 
 The database is for internal operating control only. It is not a CRM product, customer portal, or public service.
+
+## Checkpointed Daily Operator Loop
+
+- Helper script: `/Users/aileansolutions/usefulopsai/scripts/operator_loop.py`.
+- Durable tables: `operator_runs` and `operator_checkpoints`.
+- Purpose: make the daily UsefulOps operator loop restartable so a temporary Codex/OpenClaw detached-run failure does not erase the selected task, current step, or next action.
+- Start command:
+
+```bash
+cd /Users/aileansolutions/usefulopsai
+scripts/operator_loop.py start --trigger cron-0915 --objective "Move one high-priority UsefulOps startup item forward."
+```
+
+- During work, record progress:
+
+```bash
+scripts/operator_loop.py checkpoint --run-id <run_id> --step <step> --summary "<what changed>" --next-action "<next step>"
+```
+
+- On success:
+
+```bash
+scripts/operator_loop.py complete --run-id <run_id> --summary "<result>" --next-action "<next step>"
+```
+
+- On failure:
+
+```bash
+scripts/operator_loop.py fail --run-id <run_id> --error "<error>" --next-action "<recovery step>"
+```
+
+- Stale protection: `start` marks any `running` operator run older than 30 minutes as `interrupted`, writes a recovery checkpoint, and starts a fresh run linked through `previous_run_id`.
+- Smoke test completed 2026-05-30: `start`, `checkpoint`, and `complete` all wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`.

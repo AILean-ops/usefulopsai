@@ -30,3 +30,9 @@ Market-intelligence work remains the priority. UsefulOps AI runs around that day
 
 Do not commit customer data, prospect exports, secrets, payment details, inbox data, or SQLite databases.
 
+## Daily Operator Loop
+
+The daily UsefulOps cron job uses `scripts/operator_loop.py` to create durable
+`operator_runs` and `operator_checkpoints` records in the local SQLite database.
+This keeps the work restartable if a detached Codex/OpenClaw run dies before it
+can deliver a final report.

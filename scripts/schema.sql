@@ -194,6 +194,34 @@ CREATE TABLE IF NOT EXISTS action_log (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS operator_runs (
+  id TEXT PRIMARY KEY,
+  started_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  completed_at TEXT,
+  status TEXT NOT NULL DEFAULT 'running',
+  trigger_source TEXT NOT NULL,
+  objective TEXT NOT NULL,
+  selected_task_id TEXT REFERENCES tasks(id),
+  current_step TEXT NOT NULL DEFAULT 'started',
+  next_action TEXT,
+  summary TEXT,
+  last_error TEXT,
+  previous_run_id TEXT REFERENCES operator_runs(id),
+  metadata_json TEXT NOT NULL DEFAULT '{}'
+);
+
+CREATE TABLE IF NOT EXISTS operator_checkpoints (
+  id TEXT PRIMARY KEY,
+  run_id TEXT NOT NULL REFERENCES operator_runs(id),
+  checkpoint_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  step TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'noted',
+  summary TEXT NOT NULL,
+  next_action TEXT,
+  metadata_json TEXT NOT NULL DEFAULT '{}'
+);
+
 CREATE INDEX IF NOT EXISTS idx_prospects_status ON prospects(status);
 CREATE INDEX IF NOT EXISTS idx_prospects_approval_state ON prospects(approval_state);
 CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
@@ -202,3 +230,6 @@ CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
 CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
 CREATE INDEX IF NOT EXISTS idx_action_log_action_at ON action_log(action_at);
+CREATE INDEX IF NOT EXISTS idx_operator_runs_status ON operator_runs(status);
+CREATE INDEX IF NOT EXISTS idx_operator_runs_updated_at ON operator_runs(updated_at);
+CREATE INDEX IF NOT EXISTS idx_operator_checkpoints_run_id ON operator_checkpoints(run_id);
