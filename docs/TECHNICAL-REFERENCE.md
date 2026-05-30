@@ -55,6 +55,13 @@ Key local paths:
 
 Do not place card numbers, API keys, OAuth secrets, customer credentials, or sensitive client data in Git-tracked files.
 
+## Stripe
+
+- Stripe account is tied to AI Lean Solutions LLC; UsefulOps AI is an affiliate.
+- Local Stripe secret storage: `/Users/aileansolutions/usefulopsai/local/secrets/stripe.env`, ignored by Git.
+- Smoke-test script: `/Users/aileansolutions/usefulopsai/scripts/stripe_smoke_test.py`.
+- 2026-05-29 restricted-key verification: `payment_links`, `checkout_sessions`, and `customers` are readable. `subscriptions` returned HTTP 403 with the initial restricted key, so complete MRR tracking needs subscription read permission added or a separate read key with subscription access.
+
 ## Database Purpose
 
 The initial SQLite database tracks:
