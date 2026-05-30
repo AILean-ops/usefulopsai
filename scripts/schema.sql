@@ -136,6 +136,19 @@ CREATE TABLE IF NOT EXISTS revenue (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS payment_links (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  stripe_url TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'USD',
+  billing_type TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  notes TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY,
   vendor TEXT NOT NULL,
@@ -186,6 +199,6 @@ CREATE INDEX IF NOT EXISTS idx_prospects_approval_state ON prospects(approval_st
 CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
 CREATE INDEX IF NOT EXISTS idx_outreach_status ON outreach_actions(status);
 CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
+CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
 CREATE INDEX IF NOT EXISTS idx_action_log_action_at ON action_log(action_at);
-

@@ -31,6 +31,8 @@ The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machin
 - Pages project name: `usefulopsai-com`.
 - 2026-05-29 GitHub path test: static placeholder site added and pushed to `main`.
 - 2026-05-29 Cloudflare CLI status: `npx wrangler whoami` reports not authenticated; `npx wrangler pages project list` fails without `CLOUDFLARE_API_TOKEN`. Brian must connect Cloudflare Pages to the GitHub repo or provide a Cloudflare API token/login before Sauron can publish/verify deployment from the Mac mini.
+- 2026-05-29 live status: `https://usefulopsai.com/`, `https://www.usefulopsai.com/`, and `https://usefulopsai-com.pages.dev/` return the expected UsefulOps AI placeholder HTML.
+- 2026-05-29 Stripe success path: `/thank-you/` page added because Stripe payment links point to `https://usefulopsai.com/thank-you`.
 
 ## Local Private State
 
@@ -65,6 +67,7 @@ The initial SQLite database tracks:
 - Clients
 - Deliverables
 - Revenue
+- Payment links
 - Expenses
 - Tasks
 - Real-world action log
