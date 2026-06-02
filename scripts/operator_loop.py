@@ -1103,7 +1103,28 @@ Task: {title}
         "Review the bounded substep output and add a deterministic handler for the next recurring task.",
         "running",
     )
-    result = run_codex_substep(prompt, "planning", dry_run=dry_run)
+    try:
+        result = run_codex_substep(prompt, "planning", dry_run=dry_run)
+    except Exception as exc:
+        if task and not dry_run:
+            update_task_status(
+                conn,
+                task["id"],
+                "blocked",
+                f"Bounded Codex planning fallback unavailable: {exc}. Add a deterministic handler before retrying this task.",
+            )
+            action_log(
+                conn,
+                "bounded_codex_unavailable",
+                f"Blocked UsefulOps task without a deterministic handler: {title}",
+                "The optional Codex planning fallback was unavailable; task was moved out of the active queue instead of failing the operator loop.",
+            )
+        return {
+            "handler": "bounded_codex_planning_unavailable",
+            "dry_run": dry_run,
+            "task_id": task["id"] if task else None,
+            "error": str(exc),
+        }
     action_log(
         conn,
         "bounded_codex_substep",
@@ -1241,12 +1262,20 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
             )
         else:
             result = run_codex_planning_step(conn, run_id, task, dry_run=dry_run)
-            final = complete_run(
-                conn,
-                run_id,
-                "Bounded Codex planning substep completed; no deterministic task handler was available.",
-                "Add or select a deterministic handler before allowing the daily loop to modify files for this task.",
-            )
+            if result.get("handler") == "bounded_codex_planning_unavailable":
+                final = complete_run(
+                    conn,
+                    run_id,
+                    "UsefulOps task lacked a deterministic handler; optional Codex planning was unavailable, so the task was moved out of the active queue.",
+                    "Add a deterministic handler for the blocked task, then continue with the next active UsefulOps task.",
+                )
+            else:
+                final = complete_run(
+                    conn,
+                    run_id,
+                    "Bounded Codex planning substep completed; no deterministic task handler was available.",
+                    "Add or select a deterministic handler before allowing the daily loop to modify files for this task.",
+                )
         final["orchestrator"] = result
         return final
     except Exception as exc:
