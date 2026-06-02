@@ -88,10 +88,13 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 
 - Operating doc: `/Users/aileansolutions/usefulopsai/docs/GROWTH-LOOP.md`.
 - Review script: `/Users/aileansolutions/usefulopsai/scripts/strategy_review.py`.
+- Nightly self-improvement script: `/Users/aileansolutions/usefulopsai/scripts/nightly_self_improvement.py`.
 - Durable tables: `growth_batches`, `growth_batch_items`, `strategy_reviews`, and `learning_log`.
 - Purpose: automatically measure the funnel, diagnose the current bottleneck, record a lesson, and queue the next concrete high-priority task.
 - Diagnoses currently encoded: `execution_gap`, `message_or_list_gap`, `offer_gap`, `conversion_gap`, and `scale_winners`.
 - 2026-05-30 first review: `strategy-review-20260530T225139Z-de38bfe1` diagnosed an `execution_gap` because UsefulOps had 12 draft outreach rows and 0 sends. It queued task `task-growth-loop-next-action` titled `Execute first controlled outreach batch`. No emails were sent.
+- 2026-05-31 nightly self-improvement loop added: the script runs strategy review, reviews operator/system improvement opportunities, creates at most one improvement task, writes `learning_log` and `action_log`, rebuilds the private dashboard, and exits. It never sends outreach, spends money, accesses customer systems, or changes OpenClaw gateway state.
+- OpenClaw cron job `9defe561-8895-485b-944b-5110a9734db5` (`UsefulOps nightly self-improvement loop`) runs daily at `22:30 America/Los_Angeles`. It executes only `scripts/nightly_self_improvement.py` and reports the JSON summary to Discord `#announcements` (`channel:1511152439859085463`) in the UsefulOps AI category.
 
 ## Outreach Prep
 
@@ -101,6 +104,9 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - Prospect records use `status='qualified_research_ready'` and still require final public contact-page verification, suppression checks, and draft quality review before any outreach.
 - Prospecting pipeline script: `/Users/aileansolutions/usefulopsai/scripts/prospecting_pipeline.py`.
 - 2026-05-30 prospecting-ready result: pipeline seeded 12 named public prospects, created 12 public-source contact records, checked suppressions, and created 12 unsent `outreach_actions` draft rows. No emails were sent and no Gmail drafts were created.
+- Send script: `/Users/aileansolutions/usefulopsai/scripts/send_outreach_batch.py`.
+- 2026-05-31 direct-send path decision: for the first controlled outreach batch, direct Gmail send is the default because the UsefulOps authority envelope allows direct prospect contact and the compliance doc allows direct email outreach. Mailbox drafts are not the default fallback; if direct-send preflight fails, record a blocker and send 0.
+- 2026-05-31 dry-run verification: `scripts/send_outreach_batch.py --limit 2 --dry-run` succeeded through GOG Gmail dry-run, selected two draft candidates, enforced suppression/opt-out preflight, wrote a dry-run `action_log`, and sent no emails.
 - Suppression CLI examples:
 
 ```bash
@@ -130,6 +136,14 @@ The initial SQLite database tracks:
 - Checkpointed operator runs and checkpoints
 
 The database is for internal operating control only. It is not a CRM product, customer portal, or public service.
+
+## Reply Handling
+
+- Reply-handling policy: `/Users/aileansolutions/usefulopsai/docs/REPLY-HANDLING.md`.
+- Default sales mode is email-first, not email-only.
+- If a qualified prospect asks for a phone call or online meeting, Rowan should treat that as buying intent, qualify the workflow, offer async outline when sufficient, and schedule/escalate a short 15-minute discovery call only when a real attendance path exists.
+- Current live-human dependency: Brian is the likely human for live UsefulOps calls until another attendance path exists. Do not book him casually. Before asking Brian to attend, prepare a prospect call packet with company summary, qualification rationale, thread summary, pain hypothesis, agenda, questions, likely objections, no-promise boundaries, recommended next step, follow-up draft, and payment/scope path.
+- Meeting outcomes should update `outreach_actions.response_at`, `outreach_actions.outcome`, and tasks/action logs as appropriate.
 
 ## Checkpointed Daily Operator Loop
 
@@ -162,6 +176,8 @@ scripts/operator_loop.py fail --run-id <run_id> --error "<error>" --next-action 
 - Local orchestration: `run` owns start/checkpoint/handler/verification/complete-or-fail. The first deterministic handler replaces the placeholder homepage, runs `npm run build`, updates task state/action log, and commits/pushes only when `--push` is supplied.
 - 2026-05-30 handler expansion: `run` now has deterministic local handlers for dashboard build, Stripe sync, outreach compliance, and prospect prep. These call `scripts/build_dashboard.py`, `scripts/stripe_sync.py`, and `scripts/prepare_outreach.py` rather than asking a detached Codex turn to perform multi-step work.
 - 2026-05-30 strategy handler: `run` can call `scripts/strategy_review.py` for explicit strategy/growth-loop tasks. Strategy review is internal only; it does not send outreach.
-- Bounded Codex use: `run_codex_substep` invokes `codex exec` as a subprocess with a fixed timeout and scoped prompt. It is for planning or narrow future substeps only; detached OpenClaw cron turns should not perform edits or multi-step reasoning themselves.
+- Bounded Codex use: `run_codex_substep` invokes `codex --ask-for-approval never exec ...` as a subprocess with a fixed timeout and scoped prompt. `--ask-for-approval` must be passed before the `exec` subcommand for the current Codex CLI. This fallback is for planning only; deterministic handlers should own recurring UsefulOps work.
+- 2026-06-02 autonomy hardening: `run` now has deterministic routing for `Reduce latest UsefulOps execution blocker` and `Execute first controlled outreach batch`. The blocker handler validates the Codex approval-policy syntax and records recovery. The controlled outreach handler runs `scripts/send_outreach_batch.py --limit 5`, which sends only inside the approved UsefulOps authority envelope and its suppression/opt-out checks.
 - Retry guard: OpenClaw cron job `ed7eb2ee-d5a2-40e0-b2e4-7ba807ba94ed` (`UsefulOps daily operator retry guard`) runs daily at `09:45 America/Los_Angeles`. It first calls `scripts/operator_loop.py retry-status`; it only runs `scripts/operator_loop.py run --trigger cron-0945-retry ... --push` if the 09:15 run failed, was interrupted, or never recorded a completed daily run. Normal no-retry days use `delivery.mode=none` to avoid chat noise.
+- Discord routing: as of 2026-06-01, UsefulOps AI discussion with Brian belongs in Deckard Ops `#ops-chat` (`channel:1511152390592659466`), and automated scheduled report-outs/failure alerts belong in `#announcements` (`channel:1511152439859085463`). Active UsefulOps cron deliveries and failure alerts were rerouted from Brian's DM to `#announcements`; the 09:45 retry guard still keeps normal no-retry days silent.
 - Smoke tests completed 2026-05-30: `start`, `checkpoint`, and `complete` wrote durable state to `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`; `scripts/operator_loop.py run --dry-run` selected the website handler, ran `npm run build`, marked the earlier failed manual run interrupted, and completed without publishing.

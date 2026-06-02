@@ -619,10 +619,12 @@ def next_action_for(task: sqlite3.Row | None, site_state: dict[str, Any]) -> str
         return "Prepare outreach compliance and suppression guardrails before prospecting."
     if "prospect" in title:
         return "Prepare a small qualified prospect batch with concrete reasons for contact."
-    if "outreach" in title:
-        return "Seed, research, and draft prospect outreach without sending."
+    if "controlled outreach batch" in title:
+        return "Send the first bounded outreach batch through the approved send script, then monitor replies."
     if "growth loop" in title or "strategy" in title:
         return "Run strategy review, record learnings, and queue the next highest-leverage action."
+    if "outreach" in title:
+        return "Seed, research, and draft prospect outreach without sending."
     return f"Move selected task forward: {task['title']}"
 
 
@@ -721,13 +723,13 @@ def run_codex_substep(prompt: str, label: str, dry_run: bool) -> dict[str, Any]:
     result = subprocess.run(
         [
             codex,
+            "--ask-for-approval",
+            "never",
             "exec",
             "--cd",
             str(ROOT),
             "--sandbox",
             "workspace-write",
-            "--ask-for-approval",
-            "never",
             prompt,
         ],
         cwd=str(ROOT),
@@ -1018,6 +1020,54 @@ def run_local_script_step(
     }
 
 
+def run_execution_blocker_step(
+    conn: sqlite3.Connection,
+    run_id: str,
+    task: sqlite3.Row,
+    dry_run: bool,
+) -> dict[str, Any]:
+    checkpoint(
+        conn,
+        run_id,
+        "execution_blocker_recovery_started",
+        "Local orchestrator selected the execution-blocker recovery handler.",
+        "Verify the bounded Codex CLI syntax no longer blocks daily UsefulOps work.",
+        "running",
+    )
+    result = run_command(
+        ["codex", "--ask-for-approval", "never", "exec", "--help"],
+        timeout=30,
+    )
+    require_success(result, "codex exec approval-policy syntax check")
+    if not dry_run:
+        update_task_status(
+            conn,
+            task["id"],
+            "completed",
+            "2026-06-02: Fixed the bounded Codex CLI approval-policy argument order and added deterministic operator routing so UsefulOps execution does not depend on the brittle planning fallback.",
+        )
+        action_log(
+            conn,
+            "operator_blocker_recovered",
+            "Recovered the latest UsefulOps execution blocker by fixing bounded Codex CLI syntax and deterministic task routing.",
+            "Internal operator hardening only; no external action performed.",
+        )
+    checkpoint(
+        conn,
+        run_id,
+        "execution_blocker_recovery_verified",
+        "Codex exec approval-policy syntax check completed successfully.",
+        "Continue with the next high-priority UsefulOps task.",
+        "running",
+    )
+    return {
+        "handler": "execution_blocker_recovery",
+        "dry_run": dry_run,
+        "task_id": task["id"],
+        "syntax_check": command_summary(result),
+    }
+
+
 def run_codex_planning_step(conn: sqlite3.Connection, run_id: str, task: sqlite3.Row | None, dry_run: bool) -> dict[str, Any]:
     title = task["title"] if task else "No selected task"
     prompt = f"""You are running a bounded UsefulOps AI planning substep.
@@ -1068,6 +1118,14 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
                 run_id,
                 summary,
                 "Continue with the next high-priority UsefulOps task on the next daily run.",
+            )
+        elif task and "execution blocker" in task["title"].lower():
+            result = run_execution_blocker_step(conn, run_id, task, dry_run=dry_run)
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps execution blocker recovery completed by the local orchestrator.",
+                "Continue with the first controlled outreach batch or the next high-priority UsefulOps task.",
             )
         elif task and "dashboard" in task["title"].lower():
             result = run_local_script_step(
@@ -1129,6 +1187,28 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
                 "UsefulOps strategy review completed and next growth action was queued.",
                 "Execute the queued growth-loop next action, then review results.",
             )
+        elif task and "controlled outreach batch" in task["title"].lower():
+            result = run_local_script_step(
+                conn,
+                run_id,
+                task,
+                "controlled_outreach_batch",
+                ["python3", "scripts/send_outreach_batch.py", "--limit", "5"],
+                dry_run=dry_run,
+            )
+            if not dry_run:
+                update_task_status(
+                    conn,
+                    task["id"],
+                    "completed",
+                    "2026-06-02: Local orchestrator executed the first controlled outreach batch through the approved send script and logged the result.",
+                )
+            final = complete_run(
+                conn,
+                run_id,
+                "UsefulOps first controlled outreach batch completed by the local orchestrator.",
+                "Monitor replies, opt-outs, and deliverability, then run strategy review.",
+            )
         elif task and "outreach" in task["title"].lower():
             result = run_local_script_step(
                 conn,
@@ -1142,7 +1222,7 @@ def run_once(conn: sqlite3.Connection, trigger: str, objective: str, dry_run: bo
                 conn,
                 run_id,
                 "UsefulOps prospecting pipeline prepared send-ready draft records without sending.",
-                "Review draft outreach rows and explicitly send when appropriate.",
+                "Run the controlled outreach batch handler when draft records are send-ready inside the authority envelope.",
             )
         else:
             result = run_codex_planning_step(conn, run_id, task, dry_run=dry_run)
