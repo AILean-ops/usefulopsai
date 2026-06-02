@@ -889,17 +889,31 @@ def retry_status(conn: sqlite3.Connection) -> dict[str, Any]:
         """,
         (today, PRIMARY_DAILY_TRIGGER, DAILY_RETRY_TRIGGER),
     ).fetchall()
+    recovered_runs = conn.execute(
+        """
+        SELECT *
+        FROM operator_runs
+        WHERE date(started_at) = date(?)
+          AND status = 'completed'
+          AND trigger_source NOT LIKE '%dry-run%'
+        ORDER BY started_at DESC
+        """,
+        (today,),
+    ).fetchall()
     latest = todays_runs[0] if todays_runs else None
     completed = [row for row in todays_runs if row["status"] == "completed"]
     failed_or_interrupted = [
         row for row in todays_runs if row["status"] in ("failed", "interrupted")
     ]
     running = [row for row in todays_runs if row["status"] == "running"]
+    latest_recovery = recovered_runs[0] if recovered_runs else None
 
     should_retry = False
     reason = "No retry needed."
     if completed:
         reason = "A daily UsefulOps operator run already completed today."
+    elif latest_recovery and latest and latest_recovery["started_at"] > latest["started_at"]:
+        reason = "A later UsefulOps operator run completed today after the daily failure."
     elif failed_or_interrupted:
         should_retry = True
         reason = "A daily UsefulOps operator run failed or was interrupted today."
@@ -916,6 +930,7 @@ def retry_status(conn: sqlite3.Connection) -> dict[str, Any]:
         "reason": reason,
         "stale_runs_marked_interrupted": [row["id"] for row in stale],
         "latest_daily_run": row_to_dict(latest),
+        "latest_recovery_run": row_to_dict(latest_recovery),
         "daily_runs_today": [dict(row) for row in todays_runs],
     }
 
