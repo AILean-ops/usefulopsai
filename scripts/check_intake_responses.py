@@ -203,6 +203,31 @@ def insert_response(
             f"alert_status={alert_status}",
         ),
     )
+    if alert_status == "pending":
+        business = row.get("business_name") or "unknown business"
+        urgency = row.get("urgency") or "not specified"
+        conn.execute(
+            """
+            INSERT INTO tasks (
+              id, title, status, priority, owner, related_type, related_id,
+              notes, created_at, updated_at
+            )
+            VALUES (?, ?, 'pending', 'high', 'rowan', 'intake_form_response', ?, ?, ?, ?)
+            """,
+            (
+                new_id("task-intake"),
+                f"Review UsefulOps intake: {business}",
+                row["response_id"],
+                (
+                    f"New intake form response. Urgency: {urgency}. "
+                    f"Pain point: {shorten(row.get('pain_point'), 240) or 'not provided'}. "
+                    f"Workflow: {shorten(row.get('workflow_needing_help'), 240) or 'not provided'}. "
+                    f"Review local intake_form_responses row before follow-up."
+                ),
+                utc_now(),
+                utc_now(),
+            ),
+        )
     return True
 
 
