@@ -229,6 +229,28 @@ CREATE TABLE IF NOT EXISTS payment_links (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS intake_form_responses (
+  response_id TEXT PRIMARY KEY,
+  form_id TEXT NOT NULL,
+  submitted_at TEXT,
+  recorded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  alerted_at TEXT,
+  alert_status TEXT NOT NULL DEFAULT 'pending',
+  name TEXT,
+  email TEXT,
+  phone TEXT,
+  business_name TEXT,
+  website TEXT,
+  business_type TEXT,
+  team_size TEXT,
+  urgency TEXT,
+  pain_point TEXT,
+  workflow_needing_help TEXT,
+  tools_used TEXT,
+  worth_fixing TEXT,
+  raw_json TEXT NOT NULL DEFAULT '{}'
+);
+
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY,
   vendor TEXT NOT NULL,
@@ -333,6 +355,8 @@ CREATE INDEX IF NOT EXISTS idx_strategy_reviews_reviewed_at ON strategy_reviews(
 CREATE INDEX IF NOT EXISTS idx_learning_log_learned_at ON learning_log(learned_at);
 CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
 CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
+CREATE INDEX IF NOT EXISTS idx_intake_form_submitted_at ON intake_form_responses(submitted_at);
+CREATE INDEX IF NOT EXISTS idx_intake_form_alert_status ON intake_form_responses(alert_status);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_revenue_external_id ON revenue(external_id) WHERE external_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_stripe_sync_runs_synced_at ON stripe_sync_runs(synced_at);
 CREATE INDEX IF NOT EXISTS idx_dashboard_snapshots_snapshot_at ON dashboard_snapshots(snapshot_at);

@@ -38,6 +38,14 @@ The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machin
 - UsefulOps AI Workflow Intake Google Form: form id `1MWRj6Otr5THMgmvKccfTsN16HzhQIWqI-ggAoN15bw4`; public response URL `https://docs.google.com/forms/d/e/1FAIpQLSf4I2PCTYqdUgcJhTSK48hG6-RaubbbyEBdTBOzrvg9Vt-Zmw/viewform`; edit URL `https://docs.google.com/forms/d/1MWRj6Otr5THMgmvKccfTsN16HzhQIWqI-ggAoN15bw4/edit`. Created under `rowan.vale@usefulopsai.com` via `gog forms` with 12 qualification questions. It asks for name, email, phone, business name, website/social page, business type, team size, pain point, workflow needing help, tools used, urgency, and what would make the fix worthwhile. Google Drive permission is `anyoneWithLink` reader; public response URL verified HTTP 200 without login on 2026-06-05.
 - Calendar booking link status 2026-06-05: not yet configured in repo/site. Replace the temporary mailto intake-call CTA with Rowan's Google Calendar Appointment Schedule booking URL once Brian creates or provides it.
 
+## Intake Form Alert Loop
+
+- Script: `/Users/aileansolutions/usefulopsai/scripts/check_intake_responses.py`.
+- Durable table: `intake_form_responses` in `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`; every recorded submission also writes an `action_log` row.
+- Alert policy: the script records full response details locally, but Discord alerts are sanitized to business name, business type, urgency, submitted time, pain point summary, workflow summary, and the Google Form edit link. Email and phone remain in the local response record unless Rowan/Brian explicitly choose to surface them.
+- Existing Brian test response was marked as baseline on 2026-06-05 so future alerts only fire for new submissions.
+- OpenClaw cron job `06b1222e-7b4a-4607-9ac7-2cd484bd3e55` (`UsefulOps intake form alert loop`) polls every 10 minutes in an isolated session with `delivery.mode=none`. If `new_count > 0`, the cron prompt posts each alert to Discord `#ops-chat` (`1511152390592659466`). Failure alerts go to `#announcements` (`1511152439859085463`) with a 1-hour cooldown. Manual forced run on 2026-06-05 completed with `lastRunStatus=ok`.
+
 ## Local Private State
 
 Private operating state lives under:
