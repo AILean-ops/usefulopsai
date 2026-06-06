@@ -95,6 +95,8 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - 2026-05-30 dashboard expansion: dashboard now includes latest strategy review and recent learning-log entries.
 - 2026-05-30 local server added: dashboard can now be opened at `http://localhost:8766` with a Refresh button that calls `POST /api/refresh` to rebuild from SQLite.
 
+- 2026-06-05 budget fix: Google Workspace `$8.60/month` row `expense-google-workspace-20260602` is an approved UsefulOps commitment and must count in `Budget used`. `scripts/build_dashboard.py` now upserts this known recurring commitment as `status='approved'` before computing metrics. Rebuilt dashboard snapshot `dash-20260606T032910Z-51aee61b`; exported JSON showed `budget_used_cents=860` and HTML showed `$8.60 / $100.00`.
+
 ## Growth Loop
 
 - Operating doc: `/Users/aileansolutions/usefulopsai/docs/GROWTH-LOOP.md`.

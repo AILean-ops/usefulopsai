@@ -41,6 +41,45 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+def ensure_committed_expenses(conn: sqlite3.Connection) -> None:
+    """Keep known recurring UsefulOps commitments visible in budget metrics."""
+    now = utc_now()
+    conn.execute(
+        """
+        INSERT INTO expenses (
+          id, vendor, amount_cents, status, category, approved_by, approved_at,
+          incurred_at, recurring_interval, notes, created_at
+        )
+        VALUES (
+          'expense-google-workspace-20260602',
+          'Google Workspace',
+          860,
+          'approved',
+          'software',
+          'brian',
+          '2026-06-02T00:00:00+00:00',
+          '2026-06-02',
+          'monthly',
+          'UsefulOps Google Workspace commitment. Counts against the approved $100/month UsefulOps budget, leaving $91.40/month discretionary once Privacy.com funding card is set up.',
+          ?
+        )
+        ON CONFLICT(id) DO UPDATE SET
+          amount_cents = excluded.amount_cents,
+          status = CASE
+            WHEN expenses.status = 'planned' THEN excluded.status
+            ELSE expenses.status
+          END,
+          category = excluded.category,
+          approved_by = COALESCE(expenses.approved_by, excluded.approved_by),
+          approved_at = COALESCE(expenses.approved_at, excluded.approved_at),
+          incurred_at = COALESCE(expenses.incurred_at, excluded.incurred_at),
+          recurring_interval = excluded.recurring_interval,
+          notes = excluded.notes
+        """,
+        (now,),
+    )
+
+
 def scalar(conn: sqlite3.Connection, query: str, params: tuple[Any, ...] = ()) -> int:
     value = conn.execute(query, params).fetchone()[0]
     return int(value or 0)
@@ -328,6 +367,7 @@ def build_dashboard() -> dict[str, Any]:
     EXPORT_DIR.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
         ensure_schema(conn)
+        ensure_committed_expenses(conn)
         metrics = compute_metrics(conn)
         snapshot_id = write_snapshot(conn, metrics)
         metrics["snapshot_id"] = snapshot_id
