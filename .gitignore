@@ -1,6 +1,8 @@
 # Local operating state
 local/
 dist/
+.wrangler/
+workers/**/.wrangler/
 
 # Databases and exports
 *.sqlite

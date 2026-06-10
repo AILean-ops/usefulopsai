@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from usefulops_common import assess_outreach_copy, ensure_operating_schema
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
@@ -195,6 +197,7 @@ def connect() -> sqlite3.Connection:
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript((ROOT / "scripts" / "schema.sql").read_text(encoding="utf-8"))
+    ensure_operating_schema(conn)
     conn.commit()
 
 
@@ -348,17 +351,16 @@ def subject_for(prospect: sqlite3.Row) -> str:
 def body_for(prospect: sqlite3.Row, contact: sqlite3.Row) -> str:
     company = prospect["company"]
     reason = re.sub(r"\s+", " ", prospect["notes"] or "").replace("Public-source reason: ", "")
-    pain = prospect["pain_hypothesis"]
     fit = prospect["offer_fit"]
     return f"""Hi {company} team,
 
-I came across your public site while looking for owner-led businesses where small AI-assisted workflows could remove admin drag. {reason}
+I was looking at your public site and noticed this: {reason}
 
-My working hypothesis: {pain}
+I run UsefulOps AI. We help small owner-led teams use AI for the everyday stuff that eats time: first replies, follow-ups, quote notes, review responses, and owner summaries.
 
-UsefulOps AI helps small teams turn that kind of repeat follow-up into a simple human-reviewed workflow: draft the response, summarize what is waiting, and keep the handoff from falling through the cracks. For you, the likely starting point would be: {fit}
+Based on what I saw, a useful first project might be: {fit}
 
-Would it be useful if I sent over a short workflow-audit outline for this specific use case?
+Would you want me to send over a short, specific outline for how that could work for your team?
 
 Best,
 Rowan Vale
@@ -399,20 +401,26 @@ def draft(conn: sqlite3.Connection, limit: int | None) -> dict[str, Any]:
             skipped += 1
             continue
         before = conn.total_changes
+        subject = subject_for(prospect)
+        body = body_for(prospect, contact)
+        quality_score, quality_notes = assess_outreach_copy(subject, body)
         conn.execute(
             """
             INSERT OR IGNORE INTO outreach_actions (
               id, prospect_id, contact_id, channel, action_type, subject, body,
-              status, notes, created_at, updated_at
+              status, result_category, quality_score, quality_notes, notes,
+              created_at, updated_at
             )
-            VALUES (?, ?, ?, 'email', 'cold_initial', ?, ?, 'draft', ?, ?, ?)
+            VALUES (?, ?, ?, 'email', 'cold_initial', ?, ?, 'draft', NULL, ?, ?, ?, ?, ?)
             """,
             (
                 new_id("outreach"),
                 prospect["id"],
                 contact["id"],
-                subject_for(prospect),
-                body_for(prospect, contact),
+                subject,
+                body,
+                quality_score,
+                quality_notes,
                 "Ready for send review. Suppression checked at draft time. Not sent.",
                 now,
                 now,

@@ -101,3 +101,15 @@ Fallback:
 
 - If Tuesday preflight fails, send 0 and record the blocker.
 - Do not create mailbox drafts as a softer substitute unless the blocker specifically requires human mailbox inspection.
+
+## Result Categories And Copy Quality
+
+As of 2026-06-03, outreach results are tracked separately from row status:
+
+- `undeliverable` means a hard delivery failure or confirmed bad address.
+- `delivery_delayed` means Gmail or the recipient server is still retrying; do not suppress unless a final failure arrives.
+- `sent`, `reply`, `positive_reply`, `opt_out`, `booked`, and `paid` remain outcome categories for funnel review.
+
+The first 5-send UsefulOps batch produced one hard bounce and one temporary delay. The hard bounce is suppressed and counted as a `deliverability_gap`; the temporary delay is visible but not treated as a dead address yet.
+
+Drafts also receive a `quality_score` and `quality_notes`. The send script blocks low-scoring drafts before external send, and the nightly self-improvement loop prioritizes rewriting jargon-heavy or robotic drafts before scaling.

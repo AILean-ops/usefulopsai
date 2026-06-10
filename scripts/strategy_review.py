@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from usefulops_common import ensure_operating_schema
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
@@ -33,6 +35,7 @@ def connect() -> sqlite3.Connection:
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript((ROOT / "scripts" / "schema.sql").read_text(encoding="utf-8"))
+    ensure_operating_schema(conn)
     conn.commit()
 
 
@@ -121,7 +124,30 @@ def metrics(conn: sqlite3.Connection) -> dict[str, Any]:
     }
     replies = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE response_at IS NOT NULL OR status = 'replied'")
     positive = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE outcome IN ('positive_reply', 'interested', 'booked', 'paid')")
-    opt_outs = scalar(conn, "SELECT COUNT(*) FROM suppressions")
+    opt_outs = scalar(
+        conn,
+        """
+        SELECT COUNT(*)
+        FROM suppressions
+        WHERE lower(reason) IN ('unsubscribe', 'opt_out', 'do_not_contact')
+           OR lower(reason) LIKE '%unsubscribe%'
+           OR lower(reason) LIKE '%opt%out%'
+        """,
+    )
+    undeliverable = scalar(
+        conn,
+        "SELECT COUNT(*) FROM outreach_actions WHERE result_category = 'undeliverable' OR outcome = 'undeliverable'",
+    )
+    delivery_delayed = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE result_category = 'delivery_delayed'")
+    low_quality_drafts = scalar(
+        conn,
+        """
+        SELECT COUNT(*)
+        FROM outreach_actions
+        WHERE status = 'draft'
+          AND COALESCE(quality_score, 100) < 80
+        """,
+    )
     booked = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE outcome = 'booked'")
     paid = scalar(conn, "SELECT COUNT(*) FROM clients WHERE payment_status IN ('paid', 'active')")
     revenue = scalar(conn, "SELECT COALESCE(SUM(amount_cents), 0) FROM revenue WHERE status IN ('received', 'paid', 'succeeded')")
@@ -133,6 +159,9 @@ def metrics(conn: sqlite3.Connection) -> dict[str, Any]:
         "replies": replies,
         "positive_replies": positive,
         "opt_outs": opt_outs,
+        "undeliverable": undeliverable,
+        "delivery_delayed": delivery_delayed,
+        "low_quality_drafts": low_quality_drafts,
         "booked": booked,
         "paid": paid,
         "revenue_cents": revenue,
@@ -143,6 +172,24 @@ def metrics(conn: sqlite3.Connection) -> dict[str, Any]:
 
 
 def diagnose(m: dict[str, Any]) -> tuple[str, str, str, str, str]:
+    attempted = max(m["sends"], 1)
+    undeliverable_rate = m["undeliverable"] / attempted
+    if m["undeliverable"] > 0 and undeliverable_rate >= 0.10:
+        return (
+            "deliverability_gap",
+            f"UsefulOps has {m['undeliverable']} undeliverable result(s) from {m['sends']} sent outreach record(s), so the list quality needs attention before scaling.",
+            "Keep the batch small, mark hard bounces as undeliverable, suppress those addresses, and verify the next batch's email sources before sending.",
+            "Clean undeliverable contacts and tighten prospect email verification before the next outreach batch.",
+            "medium",
+        )
+    if m["low_quality_drafts"] > 0:
+        return (
+            "draft_quality_gap",
+            f"{m['low_quality_drafts']} draft outreach record(s) scored below the plain-language quality threshold.",
+            "Rewrite drafts in a direct owner-to-owner voice before sending: fewer abstractions, fewer workflow/process terms, and a clearer reason for the email.",
+            "Review pending outreach drafts for marketing clarity and human readability before the next send.",
+            "high",
+        )
     if m["sends"] == 0 and m["drafts"] > 0:
         return (
             "execution_gap",
@@ -187,6 +234,10 @@ def diagnose(m: dict[str, Any]) -> tuple[str, str, str, str, str]:
 def task_title_for(diagnosis_type: str) -> str:
     if diagnosis_type == "execution_gap":
         return "Execute first controlled outreach batch"
+    if diagnosis_type == "deliverability_gap":
+        return "Clean UsefulOps undeliverable outreach results"
+    if diagnosis_type == "draft_quality_gap":
+        return "Rewrite UsefulOps outreach drafts for human readability"
     if diagnosis_type == "message_or_list_gap":
         return "Prepare revised outreach variant batch"
     if diagnosis_type == "offer_gap":
@@ -209,6 +260,7 @@ def upsert_next_task(conn: sqlite3.Connection, next_action: str, diagnosis_type:
                 'strategy_review',
                 ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
+          title = excluded.title,
           status = 'pending',
           priority = 'high',
           notes = excluded.notes,
@@ -229,10 +281,10 @@ def review(scope: str = "daily") -> dict[str, Any]:
             """
             INSERT INTO strategy_reviews (
               id, reviewed_at, scope, sends, drafts, replies, positive_replies,
-              opt_outs, booked, paid, revenue_cents, diagnosis, recommendation,
+              opt_outs, undeliverable, delivery_delayed, booked, paid, revenue_cents, diagnosis, recommendation,
               next_action, metrics_json
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 review_id,
@@ -243,6 +295,8 @@ def review(scope: str = "daily") -> dict[str, Any]:
                 m["replies"],
                 m["positive_replies"],
                 m["opt_outs"],
+                m["undeliverable"],
+                m["delivery_delayed"],
                 m["booked"],
                 m["paid"],
                 m["revenue_cents"],

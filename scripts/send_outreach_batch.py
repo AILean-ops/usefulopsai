@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from usefulops_common import assess_outreach_copy, ensure_operating_schema
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
@@ -38,6 +40,7 @@ def connect() -> sqlite3.Connection:
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript((ROOT / "scripts" / "schema.sql").read_text(encoding="utf-8"))
+    ensure_operating_schema(conn)
     conn.commit()
 
 
@@ -182,6 +185,26 @@ def send_batch(limit: int, dry_run: bool) -> dict[str, Any]:
             if not row["subject"] or not row["body"]:
                 skipped.append({"outreach_id": row["outreach_id"], "email": email, "reason": "missing subject/body"})
                 continue
+            quality_score, quality_notes = assess_outreach_copy(row["subject"], row["body"])
+            conn.execute(
+                """
+                UPDATE outreach_actions
+                SET quality_score = ?,
+                    quality_notes = ?,
+                    updated_at = ?
+                WHERE id = ?
+                """,
+                (quality_score, quality_notes, utc_now(), row["outreach_id"]),
+            )
+            if quality_score < 80:
+                skipped.append(
+                    {
+                        "outreach_id": row["outreach_id"],
+                        "email": email,
+                        "reason": f"draft quality below threshold: {quality_score} ({quality_notes})",
+                    }
+                )
+                continue
             if not has_opt_out(row["body"]):
                 skipped.append({"outreach_id": row["outreach_id"], "email": email, "reason": "missing opt-out language"})
                 continue
@@ -209,6 +232,8 @@ def send_batch(limit: int, dry_run: bool) -> dict[str, Any]:
                     """
                     UPDATE outreach_actions
                     SET status = 'sent',
+                        result_category = 'sent',
+                        result_recorded_at = ?,
                         sent_at = ?,
                         approved_by = 'rowan',
                         approved_at = COALESCE(approved_at, ?),
@@ -216,7 +241,7 @@ def send_batch(limit: int, dry_run: bool) -> dict[str, Any]:
                         updated_at = ?
                     WHERE id = ?
                     """,
-                    (now, now, f"Sent via GOG Gmail. Result: {result_note}", now, row["outreach_id"]),
+                    (now, now, now, f"Sent via GOG Gmail. Result: {result_note}", now, row["outreach_id"]),
                 )
                 conn.execute(
                     """

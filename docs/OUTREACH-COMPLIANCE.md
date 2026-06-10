@@ -7,6 +7,7 @@ UsefulOps AI may prepare and send direct email outreach inside the approved auth
 - Use only public business information or a clearly stated operational hypothesis.
 - Confirm the business is not suppressed by email, domain, company, or clear prior refusal.
 - Keep the message specific enough that it could not be sent unchanged to any business.
+- Keep the language plain and human. Avoid jargon, abstractions, and phrases that sound like generated marketing copy.
 - Include a simple opt-out sentence.
 - Do not imply a relationship, endorsement, guaranteed result, compliance guarantee, or private knowledge.
 - Do not reference private/sensitive data, protected health information, customer lists, inbox contents, or anything creepy.
@@ -20,8 +21,8 @@ UsefulOps AI may prepare and send direct email outreach inside the approved auth
 
 ## Approved Initial Positioning
 
-UsefulOps AI helps owner-led small businesses turn repeat admin, follow-up, reporting, and handoff friction into practical AI-assisted workflows. The first offer should usually be a workflow audit or a bounded implementation sprint.
+UsefulOps AI helps owner-led small businesses use practical AI for everyday follow-up, inbox, reporting, and admin work. The first offer should usually be a short workflow audit or a bounded implementation sprint, described in plain business-owner language.
 
 ## Not Yet Automated
 
-No automatic sending is enabled by this checklist. Prospect prep and draft creation are allowed; actual sends must still respect suppression checks, message quality, and the current operating context.
+No automatic sending is enabled by this checklist. Prospect prep and draft creation are allowed; actual sends must still respect suppression checks, message quality scoring, and the current operating context.

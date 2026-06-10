@@ -1,0 +1,22 @@
+name = "usefulops-realtime-webhook"
+main = "src/index.js"
+compatibility_date = "2026-06-05"
+
+[vars]
+CALL_HANDLING_MODE = "reject-only"
+ALLOWED_TEST_CALLERS = "+17075696515"
+REALTIME_MODEL = "gpt-realtime-2"
+REALTIME_VOICE = "cedar"
+TEST_TARGET_SECONDS = "720"
+TEST_HARD_CUTOFF_SECONDS = "870"
+REJECT_STATUS_CODE = "486"
+
+[[queues.producers]]
+queue = "usefulops-realtime-call-control"
+binding = "CALL_CONTROL_QUEUE"
+
+[[queues.consumers]]
+queue = "usefulops-realtime-call-control"
+max_batch_size = 1
+max_batch_timeout = 1
+max_retries = 0

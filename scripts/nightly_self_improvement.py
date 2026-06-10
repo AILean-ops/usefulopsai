@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from usefulops_common import ensure_operating_schema
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
@@ -40,6 +42,7 @@ def connect() -> sqlite3.Connection:
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript((ROOT / "scripts" / "schema.sql").read_text(encoding="utf-8"))
+    ensure_operating_schema(conn)
     conn.commit()
 
 
@@ -140,6 +143,19 @@ def choose_improvement(conn: sqlite3.Connection, review: sqlite3.Row | None) -> 
 
     sends = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE status IN ('sent', 'replied')")
     drafts = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE status = 'draft'")
+    undeliverable = scalar(
+        conn,
+        "SELECT COUNT(*) FROM outreach_actions WHERE result_category = 'undeliverable' OR outcome = 'undeliverable'",
+    )
+    low_quality_drafts = scalar(
+        conn,
+        """
+        SELECT COUNT(*)
+        FROM outreach_actions
+        WHERE status = 'draft'
+          AND COALESCE(quality_score, 100) < 80
+        """,
+    )
     open_tasks = scalar(conn, "SELECT COUNT(*) FROM tasks WHERE status NOT IN ('done', 'completed', 'cancelled')")
     signature_tasks = scalar(
         conn,
@@ -157,26 +173,49 @@ def choose_improvement(conn: sqlite3.Connection, review: sqlite3.Row | None) -> 
         FROM action_log
         WHERE action_at >= datetime('now', '-2 days')
           AND (
-            lower(summary) LIKE '%block%'
-            OR lower(risk_notes) LIKE '%block%'
-            OR lower(summary) LIKE '%failed%'
-            OR lower(risk_notes) LIKE '%failed%'
+            lower(summary) LIKE '%blocker%'
+            OR lower(risk_notes) LIKE '%blocker%'
+            OR lower(summary) LIKE '% failed%'
+            OR lower(risk_notes) LIKE '% failed%'
           )
+          AND lower(summary) NOT LIKE '%failed=0%'
+          AND lower(risk_notes) NOT LIKE '%failed=0%'
         """,
     )
-
-    if recent_blockers:
-        return {
-            "title": "Reduce latest UsefulOps execution blocker",
-            "priority": "high",
-            "notes": "Nightly self-improvement found recent blocker/failure language in action_log. Inspect the latest blocker, narrow root cause, and add a deterministic script/check/cron change so it does not recur.",
-        }
 
     if drafts > 0 and sends == 0:
         return {
             "title": "Verify first-batch send path end to end",
             "priority": "high",
             "notes": "Nightly self-improvement found drafts but zero sends. Verify sender auth, suppression checks, send command, and SQLite send recording path before the controlled batch executes.",
+        }
+
+    if undeliverable > 0:
+        return {
+            "title": "Clean UsefulOps undeliverable outreach results",
+            "priority": "high",
+            "notes": "Nightly self-improvement found hard-bounced outreach. Confirm the failed recipient, set result_category='undeliverable', suppress that email/domain if appropriate, and tighten the next batch's email-source checks before sending more.",
+        }
+
+    if low_quality_drafts > 0:
+        return {
+            "title": "Rewrite UsefulOps outreach drafts for human readability",
+            "priority": "high",
+            "notes": "Nightly self-improvement found pending drafts below the readability threshold. Rewrite them in plain owner language, remove jargon/robotic phrasing, and keep the CTA concrete before the next send.",
+        }
+
+    if drafts > 0 and sends <= 10:
+        return {
+            "title": "Review UsefulOps outgoing drafts for human readability",
+            "priority": "normal",
+            "notes": "Before the next small send batch, review pending outreach from a marketing and human-readability perspective. Favor specific, plain, owner-to-owner language over abstractions like workflows, operating systems, or process terminology.",
+        }
+
+    if recent_blockers:
+        return {
+            "title": "Reduce latest UsefulOps execution blocker",
+            "priority": "high",
+            "notes": "Nightly self-improvement found recent blocker/failure language in action_log. Inspect the latest blocker, narrow root cause, and add a deterministic script/check/cron change so it does not recur.",
         }
 
     if signature_tasks == 0 and sends <= 10:
@@ -228,11 +267,7 @@ def main() -> int:
             review["id"] if review else None,
         )
         finding = "Nightly self-improvement reviewed business metrics and operator behavior with a one-task governor."
-        decision = (
-            f"Created improvement task: {improvement['title']}"
-            if created
-            else f"Improvement task already existed: {improvement['title']}"
-        )
+        decision = f"Created improvement task: {improvement['title']}" if created else f"Improvement task already queued: {improvement['title']}"
         record_learning(conn, review["id"] if review else "no-review", finding, decision)
         action_log(
             conn,
@@ -248,6 +283,7 @@ def main() -> int:
         "strategy_review": strategy_result,
         "improvement_task": improvement,
         "task_created": created,
+        "task_action": "created" if created else "already_queued",
         "dashboard_rebuilt": bool(dashboard_result.get("ok", False) or dashboard_result.get("snapshot_id")),
         "limits": {
             "external_action": False,

@@ -51,6 +51,13 @@ UsefulOps must be run as a business operating system, not as a sequence of cleve
 - Do not let self-improvement displace customer acquisition, delivery, or revenue work; improvement must serve those outcomes.
 - Do not create recursive chains of self-improvement tasks. If an improvement task proposes another improvement task, require it to name the business metric it improves.
 - Keep runtime bounded and quiet unless the run creates a task, finds a blocker, or changes a durable artifact.
+- Outcome analysis must change behavior. If an outreach, intake, phone-test, or delivery result shows weak signal, deliverability trouble, awkward call behavior, poor conversion, or a repeated blocker, update the next batch, script, prompt, schedule, or task priority. Do not keep executing the same ineffective loop just because it is scheduled.
+
+## Booking And Client Alerts
+
+- Brian wants to know ASAP if UsefulOps books a client, receives a meaningful intake/call booking, records revenue, or creates a client row.
+- Keep `scripts/check_booking_client_alerts.py` and OpenClaw cron `26702ac4-ec84-4ad8-8ae1-4bcf1520d0e0` active unless Brian pauses UsefulOps alerts.
+- Alert only business-safe summaries in Discord; do not post full private form responses, sensitive client details, phone numbers, or transcripts.
 
 ## Before Any Client Delivery
 
@@ -70,6 +77,13 @@ UsefulOps must be run as a business operating system, not as a sequence of cleve
 - Do not imply live human attendance unless a real attendance path exists.
 - If Brian is needed for the call, create a prep packet before asking him to attend.
 - Do not book Brian unless he has explicitly accepted the time or delegated scheduling authority for that specific case.
+
+## Before Offering Paid Subscriber Voice Access
+
+- Do not rely on the 15-minute intake-call Queue controller for paying monthly subscribers.
+- Confirm a true long-lived call controller exists and has been tested beyond the planned subscriber call length.
+- Confirm the controller can maintain OpenAI Realtime WebSocket control, enforce budget/duration rules, preserve notes/summaries, and hang up cleanly.
+- Treat this as mandatory before Rowan offers or fulfills paid subscriber voice access.
 
 ## Kill Switch
 

@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from usefulops_common import ensure_operating_schema
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
@@ -38,6 +40,7 @@ def connect() -> sqlite3.Connection:
 
 def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript((ROOT / "scripts" / "schema.sql").read_text(encoding="utf-8"))
+    ensure_operating_schema(conn)
     conn.commit()
 
 
@@ -109,6 +112,15 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
     ).fetchone()
     mrr = int(latest_sync["active_mrr_cents"]) if latest_sync else 0
     expenses = scalar(conn, "SELECT COALESCE(SUM(amount_cents), 0) FROM expenses WHERE status IN ('approved', 'incurred', 'paid')")
+    undeliverable = scalar(
+        conn,
+        "SELECT COUNT(*) FROM outreach_actions WHERE result_category = 'undeliverable' OR outcome = 'undeliverable'",
+    )
+    delivery_delayed = scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE result_category = 'delivery_delayed'")
+    avg_quality = scalar(
+        conn,
+        "SELECT COALESCE(ROUND(AVG(quality_score)), 0) FROM outreach_actions WHERE status = 'draft' AND quality_score IS NOT NULL",
+    )
     tax_reserve = round(gross * 0.30)
     post_tax = max(gross - tax_reserve - expenses, 0)
     brian_share = round(post_tax * 0.50)
@@ -126,6 +138,9 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
         "active_prospects": scalar(conn, "SELECT COUNT(*) FROM prospects WHERE status NOT IN ('disqualified', 'converted')"),
         "cold_contacts_sent": scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE status = 'sent' AND action_type LIKE '%cold%'"),
         "replies": scalar(conn, "SELECT COUNT(*) FROM outreach_actions WHERE response_at IS NOT NULL OR status = 'replied'"),
+        "undeliverable": undeliverable,
+        "delivery_delayed": delivery_delayed,
+        "avg_outreach_quality_score": avg_quality,
         "active_clients": scalar(conn, "SELECT COUNT(*) FROM clients WHERE status = 'active'"),
         "open_deliverables": scalar(conn, "SELECT COUNT(*) FROM deliverables WHERE status NOT IN ('delivered', 'cancelled')"),
         "open_tasks": scalar(conn, "SELECT COUNT(*) FROM tasks WHERE status IN ('pending', 'in_progress')"),
@@ -141,6 +156,16 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
         ),
         "tasks": rows(conn, "SELECT title, status, priority, updated_at FROM tasks ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END, updated_at DESC LIMIT 8"),
         "recent_actions": rows(conn, "SELECT action_at, action_type, summary FROM action_log ORDER BY action_at DESC LIMIT 10"),
+        "outreach_results": rows(
+            conn,
+            """
+            SELECT COALESCE(result_category, status, 'unknown') AS result_category,
+                   COUNT(*) AS count
+            FROM outreach_actions
+            GROUP BY COALESCE(result_category, status, 'unknown')
+            ORDER BY count DESC, result_category
+            """,
+        ),
         "latest_stripe_sync": dict(latest_sync) if latest_sync else None,
         "latest_strategy_review": rows(
             conn,
@@ -243,6 +268,8 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
         ("UsefulOps growth", money(metrics["usefulops_growth_cents"])),
         ("Budget used", f"{money(metrics['budget_used_cents'])} / {money(metrics['budget_limit_cents'])}"),
         ("Active prospects", str(metrics["active_prospects"])),
+        ("Undeliverable", str(metrics["undeliverable"])),
+        ("Draft quality", str(metrics["avg_outreach_quality_score"] or "n/a")),
         ("Open tasks", str(metrics["open_tasks"])),
     ]
     card_html = "\n".join(
@@ -260,6 +287,10 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
     learning_rows = "\n".join(
         f"<li><strong>{html.escape(row['lesson_type'])}</strong><span>{html.escape(row['decision'])}</span></li>"
         for row in metrics["recent_learnings"]
+    )
+    result_rows = "\n".join(
+        f"<tr><td>{html.escape(row['result_category'])}</td><td>{int(row['count'] or 0)}</td></tr>"
+        for row in metrics["outreach_results"]
     )
     review = metrics["latest_strategy_review"][0] if metrics["latest_strategy_review"] else None
     review_html = (
@@ -330,6 +361,10 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
       <section class="section">
         <h2>Strategy Review</h2>
         {review_html}
+      </section>
+      <section class="section">
+        <h2>Outreach Results</h2>
+        <table><thead><tr><th>Result</th><th>Count</th></tr></thead><tbody>{result_rows}</tbody></table>
       </section>
       <section class="section">
         <h2>Learning Log</h2>

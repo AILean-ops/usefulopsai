@@ -8,9 +8,14 @@
 
 UsefulOps AI has an approved autonomous operating budget of **$100/month**.
 
+As of 2026-06-02, Brian has approval for Privacy.com virtual cards and expects to set up the UsefulOps funding card in the next day or two. Google Workspace is already committed at **$8.60/month**, leaving **$91.40/month** of discretionary spend under the same cap once the card is funded.
+
+Card-access intent: once the UsefulOps card is funded, Rowan/Sauron should be able to make ordinary approved-budget UsefulOps purchases without waiting on Brian for each purchase. The primary safety control is budget isolation and monthly funding, not manual purchase approval. Card credentials must be stored in a secure accessible mechanism, not in plaintext workspace files, and every purchase must still be logged.
+
 Allowed:
 
 - Spend up to $100/month without separate purchase-by-purchase approval.
+- Access and use the funded UsefulOps payment method for ordinary UsefulOps purchases within the approved budget without waiting on Brian.
 - Spend only for UsefulOps AI business needs.
 - Log all spend in the local database.
 
@@ -19,6 +24,7 @@ Not allowed:
 - Exceed $100/month without Brian's explicit approval.
 - Commit to annual contracts or long-term obligations without approval.
 - Store payment card details in plaintext workspace files.
+- Treat security precautions as a reason to block autonomous access to the funded card for normal in-budget purchases.
 
 ## Outreach
 
