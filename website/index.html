@@ -1,26 +1,27 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>UsefulOps AI | Practical AI Operations Help</title>
-    <meta name="description" content="UsefulOps AI is an AI-operated consulting business that helps owner-led small businesses improve repeat workflows, follow-up, reporting, and admin handoffs.">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UsefulOps AI | Fix One Broken Workflow With Practical AI</title>
+    <meta name="description" content="UsefulOps AI helps owner-led small businesses fix one broken workflow at a time with practical AI-assisted processes, templates, checklists, and support." />
     <style>
       :root {
         color-scheme: light;
-        --ink: #19212c;
+        --ink: #182028;
         --muted: #596676;
-        --line: #d9e0e9;
-        --paper: #f5f7fa;
-        --panel: #ffffff;
+        --paper: #eef1ec;
+        --panel: #fbfbf7;
+        --line: #cbd4ce;
+        --steel: #34495a;
         --teal: #0f766e;
-        --teal-dark: #115e59;
-        --gold: #b7791f;
-        --blue: #245b8f;
-        --plum: #6b4e71;
-        --green-soft: #e5f4ef;
-        --gold-soft: #fff4d8;
-        --blue-soft: #e8f0fa;
+        --green: #dfeee7;
+        --clay: #b15d3d;
+        --amber: #d9a441;
+        --blue: #2e6386;
+        --dark: #15242f;
+        --white: #ffffff;
+        --max: 1160px;
       }
 
       * { box-sizing: border-box; }
@@ -30,27 +31,30 @@
       body {
         margin: 0;
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: var(--paper);
         color: var(--ink);
+        background: var(--paper);
+        line-height: 1.55;
+        letter-spacing: 0;
       }
 
       a { color: inherit; }
 
       .wrap {
-        width: min(1120px, calc(100% - 40px));
+        width: min(var(--max), calc(100% - 40px));
         margin: 0 auto;
       }
 
       header {
-        border-bottom: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.92);
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 30;
+        background: rgba(238, 241, 236, 0.94);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(16px);
       }
 
       nav {
-        min-height: 72px;
+        min-height: 74px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -59,25 +63,26 @@
 
       .brand {
         display: grid;
-        gap: 2px;
+        gap: 1px;
+        text-decoration: none;
       }
 
       .brand strong {
-        font-size: 20px;
-        letter-spacing: 0;
+        font-size: 1.18rem;
       }
 
       .brand span {
         color: var(--muted);
-        font-size: 13px;
+        font-size: 0.83rem;
       }
 
       .nav-links {
         display: flex;
-        gap: 20px;
         align-items: center;
+        gap: 18px;
         color: var(--muted);
-        font-size: 15px;
+        font-size: 0.92rem;
+        font-weight: 750;
       }
 
       .nav-links a {
@@ -86,62 +91,61 @@
 
       .button {
         display: inline-flex;
+        min-height: 48px;
         align-items: center;
         justify-content: center;
-        min-height: 44px;
-        padding: 0 18px;
-        border: 1px solid var(--teal-dark);
+        padding: 12px 18px;
+        border: 2px solid var(--dark);
         background: var(--teal);
-        color: #fff;
-        font-weight: 800;
+        color: var(--white);
         text-decoration: none;
-        text-align: center;
+        font: inherit;
+        font-weight: 850;
+        cursor: pointer;
       }
 
       .button.secondary {
         background: transparent;
-        color: var(--teal-dark);
+        color: var(--dark);
       }
 
-      .button.gold {
-        border-color: #8a5a14;
-        background: var(--gold);
+      .button.amber {
+        background: var(--amber);
+        color: var(--dark);
       }
 
       .hero {
-        padding: clamp(56px, 9vw, 104px) 0 40px;
+        padding: clamp(56px, 8vw, 104px) 0 42px;
       }
 
       .hero-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
-        gap: clamp(32px, 6vw, 72px);
+        grid-template-columns: minmax(0, 0.98fr) minmax(340px, 0.78fr);
+        gap: clamp(32px, 6vw, 70px);
         align-items: center;
       }
 
       .eyebrow {
-        margin: 0 0 18px;
-        color: var(--teal-dark);
-        font-size: 13px;
+        margin: 0 0 16px;
+        color: var(--teal);
+        font-size: 0.8rem;
         font-weight: 900;
-        letter-spacing: 0;
         text-transform: uppercase;
       }
 
       h1 {
-        margin: 0;
         max-width: 820px;
-        font-size: clamp(40px, 7vw, 74px);
-        line-height: 0.99;
+        margin: 0;
+        font-size: clamp(3rem, 7vw, 6.8rem);
+        line-height: 0.92;
         letter-spacing: 0;
       }
 
       .lede {
         max-width: 720px;
         margin: 24px 0 0;
-        color: var(--muted);
-        font-size: clamp(18px, 2vw, 22px);
-        line-height: 1.55;
+        color: #334155;
+        font-size: clamp(1.08rem, 2vw, 1.32rem);
       }
 
       .actions {
@@ -151,339 +155,281 @@
         margin-top: 30px;
       }
 
-      .operator-panel {
-        display: grid;
-        gap: 18px;
-        border: 1px solid var(--line);
+      .workbench {
+        border: 2px solid var(--dark);
         background: var(--panel);
-        padding: clamp(22px, 4vw, 34px);
-        box-shadow: 0 24px 50px rgba(25, 33, 44, 0.08);
+        box-shadow: 14px 14px 0 rgba(21, 36, 47, 0.14);
       }
 
-      .operator-header {
-        display: grid;
-        grid-template-columns: 72px 1fr;
+      .workbench-head {
+        display: flex;
+        justify-content: space-between;
         gap: 16px;
-        align-items: center;
+        border-bottom: 2px solid var(--dark);
+        background: var(--dark);
+        color: var(--white);
+        padding: 14px 16px;
+        font-weight: 850;
       }
 
-      .avatar {
-        width: 72px;
-        height: 72px;
+      .workbench-body {
         display: grid;
-        place-items: center;
-        border: 2px solid var(--teal);
-        background: var(--green-soft);
-        color: var(--teal-dark);
-        font-size: 30px;
-        font-weight: 900;
+        gap: 14px;
+        padding: 20px;
       }
 
-      .operator-panel h2,
-      .operator-panel p {
-        margin: 0;
-      }
-
-      .operator-panel h2 {
-        font-size: 24px;
-      }
-
-      .operator-panel p,
-      .card p,
-      .split p,
-      .process-card p,
-      .intake-copy p,
-      li {
-        color: var(--muted);
-        line-height: 1.6;
-      }
-
-      .promise-list {
+      .workflow-row {
         display: grid;
-        gap: 10px;
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
-
-      .promise-list li {
-        display: grid;
-        grid-template-columns: 28px 1fr;
-        gap: 10px;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
         align-items: start;
       }
 
-      .mark {
-        width: 28px;
-        height: 28px;
+      .num {
+        width: 34px;
+        height: 34px;
         display: grid;
         place-items: center;
-        background: var(--gold-soft);
-        color: #8a5a14;
+        background: var(--green);
+        border: 1px solid var(--teal);
+        color: var(--teal);
         font-weight: 900;
       }
 
+      .workflow-row strong {
+        display: block;
+        margin-bottom: 3px;
+      }
+
+      .workflow-row p {
+        margin: 0;
+        color: var(--muted);
+      }
+
       section {
-        padding: 58px 0;
+        padding: clamp(50px, 8vw, 86px) 0;
       }
 
       .band {
-        background: #fff;
+        background: var(--panel);
         border-top: 1px solid var(--line);
         border-bottom: 1px solid var(--line);
       }
 
+      .section-head {
+        max-width: 820px;
+        margin-bottom: 28px;
+      }
+
       h2 {
-        margin: 0 0 22px;
-        font-size: clamp(28px, 4vw, 44px);
-        line-height: 1.08;
+        margin: 0;
+        font-size: clamp(2rem, 4.6vw, 4.1rem);
+        line-height: 1;
         letter-spacing: 0;
       }
 
-      .section-lede {
-        max-width: 720px;
-        margin: -8px 0 26px;
+      .section-head p {
+        margin: 14px 0 0;
         color: var(--muted);
-        font-size: 18px;
-        line-height: 1.6;
+        font-size: 1.08rem;
       }
 
       .grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
+        gap: 16px;
       }
 
-      .card {
-        min-height: 220px;
-        border: 1px solid var(--line);
-        background: var(--panel);
-        padding: 24px;
-      }
-
-      .card h3 {
-        margin: 0 0 12px;
-        font-size: 20px;
-      }
-
-      .process-map {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 28px;
-      }
-
-      .process-card {
-        position: relative;
-        min-height: 240px;
+      .card,
+      .artifact,
+      .offer,
+      .intake-panel {
         border: 1px solid var(--line);
         background: var(--panel);
         padding: 22px;
       }
 
-      .process-card::after {
-        content: "";
-        position: absolute;
-        top: 42px;
-        right: -14px;
-        width: 14px;
-        border-top: 3px solid var(--line);
+      .card {
+        min-height: 190px;
       }
 
-      .process-card:last-child::after {
-        display: none;
+      .card strong,
+      .offer strong,
+      .artifact strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.05rem;
       }
 
-      .step-icon {
-        width: 48px;
-        height: 48px;
-        display: grid;
-        place-items: center;
-        margin-bottom: 18px;
-        color: var(--ink);
-        font-weight: 900;
-        font-size: 18px;
-      }
-
-      .process-card:nth-child(1) .step-icon { background: var(--green-soft); color: var(--teal-dark); }
-      .process-card:nth-child(2) .step-icon { background: var(--gold-soft); color: #8a5a14; }
-      .process-card:nth-child(3) .step-icon { background: var(--blue-soft); color: var(--blue); }
-      .process-card:nth-child(4) .step-icon { background: #f2eafa; color: var(--plum); }
-      .process-card:nth-child(5) .step-icon { background: #eaf4e7; color: #3f6b35; }
-
-      .process-card h3 {
-        margin: 0 0 10px;
-        font-size: 19px;
-      }
-
-      .process-card p {
+      .card p,
+      .offer p,
+      .artifact p,
+      .intake-panel p,
+      li {
         margin: 0;
+        color: var(--muted);
+      }
+
+      .process {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        border: 2px solid var(--dark);
+        background: var(--panel);
+      }
+
+      .process-step {
+        min-height: 210px;
+        padding: 22px;
+        border-right: 1px solid var(--line);
+      }
+
+      .process-step:last-child {
+        border-right: 0;
+      }
+
+      .process-step span {
+        display: inline-flex;
+        margin-bottom: 20px;
+        color: var(--clay);
+        font-weight: 900;
       }
 
       .split {
         display: grid;
-        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-        gap: clamp(28px, 5vw, 56px);
-      }
-
-      ul {
-        margin: 0;
-        padding-left: 22px;
-      }
-
-      li + li {
-        margin-top: 10px;
-      }
-
-      .offer-list {
-        display: grid;
-        gap: 14px;
-      }
-
-      .offer {
-        border: 1px solid var(--line);
-        background: #fff;
-        padding: 20px;
-      }
-
-      .offer h3 {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 12px;
-        margin: 0 0 8px;
-        font-size: 19px;
-      }
-
-      .price {
-        color: var(--blue);
-        font-size: 15px;
-        white-space: nowrap;
-      }
-
-      .intake {
-        background: var(--ink);
-        color: #fff;
-      }
-
-      .intake .section-lede,
-      .intake p,
-      .intake li {
-        color: #d9e1ea;
-      }
-
-      .intake-grid {
-        display: grid;
-        grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
-        gap: clamp(24px, 5vw, 46px);
+        grid-template-columns: minmax(0, 0.86fr) minmax(320px, 1fr);
+        gap: clamp(28px, 6vw, 68px);
         align-items: start;
       }
 
-      .intake-copy {
+      .offers {
         display: grid;
-        gap: 18px;
+        gap: 16px;
       }
 
-      .intake-box {
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        background: rgba(255, 255, 255, 0.08);
-        padding: 20px;
+      .offer {
+        display: grid;
+        gap: 12px;
+      }
+
+      .price {
+        color: var(--teal);
+        font-size: 1.55rem;
+        font-weight: 900;
+      }
+
+      .artifact {
+        background: #f8f5ee;
+        border-left: 8px solid var(--blue);
+      }
+
+      .artifact + .artifact {
+        margin-top: 14px;
+      }
+
+      .rules {
+        display: grid;
+        gap: 12px;
+        padding-left: 1.15rem;
+      }
+
+      .intake-panel {
+        border: 2px solid var(--dark);
+        background: var(--dark);
+        color: var(--white);
+      }
+
+      .intake-panel p,
+      .intake-panel li {
+        color: #d9e3e8;
+      }
+
+      .intake-panel ul {
+        display: grid;
+        gap: 10px;
+        margin: 18px 0 0;
+        padding-left: 1.15rem;
+      }
+
+      .intake-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
       }
 
       .form-frame {
         width: 100%;
-        min-height: 760px;
-        border: 0;
-        background: #fff;
+        min-height: 780px;
+        border: 1px solid var(--line);
+        background: var(--white);
       }
 
-      .form-shell {
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        background: #fff;
-      }
-
-      .footer {
-        padding: 36px 0;
+      footer {
+        padding: 28px 0;
+        border-top: 1px solid var(--line);
         color: var(--muted);
-        font-size: 14px;
+        font-size: 0.92rem;
       }
 
-      .footer-grid {
+      footer .wrap {
         display: flex;
-        justify-content: space-between;
-        gap: 20px;
         flex-wrap: wrap;
+        gap: 12px 20px;
+        justify-content: space-between;
       }
 
-      @media (max-width: 980px) {
-        .process-map {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .process-card::after {
-          display: none;
-        }
-      }
-
-      @media (max-width: 820px) {
+      @media (max-width: 920px) {
         .hero-grid,
-        .split,
-        .grid,
-        .intake-grid {
+        .split {
           grid-template-columns: 1fr;
+        }
+
+        .grid,
+        .process {
+          grid-template-columns: 1fr;
+        }
+
+        .process-step {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .process-step:last-child {
+          border-bottom: 0;
         }
 
         .nav-links {
           display: none;
         }
-
-        .operator-header {
-          grid-template-columns: 60px 1fr;
-        }
-
-        .avatar {
-          width: 60px;
-          height: 60px;
-          font-size: 26px;
-        }
       }
 
       @media (max-width: 560px) {
         .wrap {
-          width: min(100% - 28px, 1120px);
+          width: min(100% - 28px, var(--max));
+        }
+
+        .button {
+          width: 100%;
         }
 
         h1 {
-          font-size: 39px;
-        }
-
-        .process-map {
-          grid-template-columns: 1fr;
-        }
-
-        .offer h3 {
-          display: grid;
-        }
-
-        .form-frame {
-          min-height: 850px;
+          font-size: clamp(2.8rem, 17vw, 4.8rem);
         }
       }
     </style>
   </head>
   <body>
     <header>
-      <nav class="wrap" aria-label="Primary navigation">
-        <div class="brand">
+      <nav class="wrap" aria-label="Primary">
+        <a class="brand" href="/">
           <strong>UsefulOps AI</strong>
-          <span>Practical operations help from Rowan Vale</span>
-        </div>
+          <span>Practical workflow repair from an AI-operated consulting business</span>
+        </a>
         <div class="nav-links">
+          <a href="#workflows">Workflows</a>
           <a href="#process">Process</a>
-          <a href="#services">Services</a>
-          <a href="#intake">Start intake</a>
-          <a href="mailto:rowan.vale@usefulopsai.com">rowan.vale@usefulopsai.com</a>
+          <a href="#offers">Offers</a>
+          <a href="#intake">Intake</a>
         </div>
       </nav>
     </header>
@@ -492,160 +438,125 @@
       <section class="hero">
         <div class="wrap hero-grid">
           <div>
-            <p class="eyebrow">AI-operated consulting for small business workflows</p>
-            <h1>Less admin drag. Better follow-up. Workflows your team can actually use.</h1>
-            <p class="lede">
-              UsefulOps AI helps owner-led businesses find the repeat work that is wasting time,
-              design a clearer process, and use AI carefully where it improves service, speed, and follow-through.
-            </p>
+            <p class="eyebrow">For owner-led businesses with too many dropped balls</p>
+            <h1>Fix one broken workflow with practical AI.</h1>
+            <p class="lede">UsefulOps AI maps the process that is wasting time, losing follow-up, or creating inconsistency, then installs a simple AI-assisted way to run it better.</p>
             <div class="actions">
-              <a class="button" href="#intake">Share your workflow pain point</a>
-              <a class="button secondary" href="https://calendar.app.google/j1pPihP5wcXVhhAo8" target="_blank" rel="noopener">Book a 15-minute intake call</a>
+              <a class="button" href="#intake">Start a Quick Win Audit</a>
+              <a class="button secondary" href="#workflows">See workflows we fix</a>
             </div>
           </div>
-          <aside class="operator-panel" aria-label="About Rowan Vale">
-            <div class="operator-header">
-              <div class="avatar" aria-hidden="true">RV</div>
-              <div>
-                <p class="eyebrow">Meet Rowan Vale</p>
-                <h2>An AI operator focused on useful work.</h2>
+          <aside class="workbench" aria-label="UsefulOps workflow bench">
+            <div class="workbench-head">
+              <span>Workflow Repair Bench</span>
+              <span>v1</span>
+            </div>
+            <div class="workbench-body">
+              <div class="workflow-row">
+                <span class="num">1</span>
+                <div><strong>Map the current mess</strong><p>Where does the work start, stall, repeat, or disappear?</p></div>
+              </div>
+              <div class="workflow-row">
+                <span class="num">2</span>
+                <div><strong>Install the assistant layer</strong><p>Prompts, templates, checklists, forms, or summaries where they actually help.</p></div>
+              </div>
+              <div class="workflow-row">
+                <span class="num">3</span>
+                <div><strong>Document the new standard</strong><p>So the improvement survives Tuesday afternoon, not just the demo.</p></div>
               </div>
             </div>
-            <p>
-              Rowan is the public-facing AI operator behind UsefulOps AI: calm, practical,
-              and built to help small business owners turn messy repeat work into a simple next step.
-            </p>
-            <ul class="promise-list" aria-label="Service promises">
-              <li><span class="mark">1</span><span>Initial phone intakes are short, focused, and capped at 12-15 minutes.</span></li>
-              <li><span class="mark">2</span><span>No video calls, no pressure pitch, and no confusing AI theater.</span></li>
-              <li><span class="mark">3</span><span>Customer service and useful follow-through matter more than fancy automation.</span></li>
-            </ul>
           </aside>
         </div>
       </section>
 
-      <section class="band" id="process">
+      <section id="workflows" class="band">
         <div class="wrap">
-          <h2>A simple consulting process that starts with the work, not the software.</h2>
-          <p class="section-lede">
-            You do not need to know AI terms. You only need to explain what keeps getting delayed,
-            repeated, missed, copied by hand, or stuck waiting on one person.
-          </p>
-          <div class="process-map" aria-label="UsefulOps AI consulting process">
-            <article class="process-card">
-              <div class="step-icon" aria-hidden="true">1</div>
-              <h3>Tell Rowan what hurts</h3>
-              <p>Use the intake form to describe the business, the pain point, and the workflow that needs the most help.</p>
-            </article>
-            <article class="process-card">
-              <div class="step-icon" aria-hidden="true">2</div>
-              <h3>Short phone intake</h3>
-              <p>A focused 12-15 minute call confirms the problem, the people involved, and what a useful first win would look like.</p>
-            </article>
-            <article class="process-card">
-              <div class="step-icon" aria-hidden="true">3</div>
-              <h3>Workflow diagnosis</h3>
-              <p>Rowan maps the handoffs, delays, tools, and repeat decisions so the fix is grounded in how the business really works.</p>
-            </article>
-            <article class="process-card">
-              <div class="step-icon" aria-hidden="true">4</div>
-              <h3>Practical improvement</h3>
-              <p>UsefulOps proposes a small, testable workflow improvement before any larger build or monthly support plan.</p>
-            </article>
-            <article class="process-card">
-              <div class="step-icon" aria-hidden="true">5</div>
-              <h3>Monitor and tune</h3>
-              <p>For paying clients, Rowan helps watch the workflow, improve the prompts/process, and keep service quality high.</p>
-            </article>
+          <div class="section-head">
+            <p class="eyebrow">Start where the pain is visible</p>
+            <h2>Useful AI starts with repeat work.</h2>
+            <p>We are not trying to sprinkle AI over everything. We pick one process that creates friction and make the next version easier to run.</p>
           </div>
-        </div>
-      </section>
-
-      <section id="services">
-        <div class="wrap">
-          <h2>Focused help where AI can carry real operational weight.</h2>
           <div class="grid">
-            <article class="card">
-              <h3>Workflow Audit</h3>
-              <p>Map the recurring admin drag, identify the best AI-assisted workflow candidates, and leave with a prioritized implementation plan.</p>
-            </article>
-            <article class="card">
-              <h3>Implementation Sprint</h3>
-              <p>Build one useful workflow end to end: intake, drafting, review, follow-up, reporting, or another bounded operating loop.</p>
-            </article>
-            <article class="card">
-              <h3>Ongoing Operator Support</h3>
-              <p>Keep workflows sharp with documentation, process tuning, lightweight automation fixes, and practical adoption support.</p>
-            </article>
+            <article class="card"><strong>Lead intake and follow-up</strong><p>Standard first replies, lead notes, follow-up reminders, and owner review summaries.</p></article>
+            <article class="card"><strong>Customer messages</strong><p>Draft replies for common questions, complaints, review requests, and appointment prep.</p></article>
+            <article class="card"><strong>Quotes and proposals</strong><p>Turn notes into first drafts, scope summaries, option lists, and next-step emails.</p></article>
+            <article class="card"><strong>Reviews and feedback</strong><p>Find recurring themes, draft owner-approved replies, and convert complaints into process fixes.</p></article>
+            <article class="card"><strong>Owner dashboards</strong><p>Weekly summaries from forms, sheets, emails, or simple operating trackers.</p></article>
+            <article class="card"><strong>SOPs and training</strong><p>Turn scattered know-how into checklists, job aids, and searchable operating notes.</p></article>
           </div>
         </div>
       </section>
 
-      <section class="band" id="fit">
+      <section id="process">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">How the work moves</p>
+            <h2>Small enough to finish. Useful enough to keep.</h2>
+          </div>
+          <div class="process">
+            <article class="process-step"><span>01 / Intake</span><h3>Describe the workflow.</h3><p>We collect the business context, pain point, tools, handoffs, and what would make the fix worth it.</p></article>
+            <article class="process-step"><span>02 / Diagnose</span><h3>Find the best first fix.</h3><p>We rank the workflow opportunities by value, risk, ease, and likelihood your team will actually use it.</p></article>
+            <article class="process-step"><span>03 / Install</span><h3>Build the working process.</h3><p>Templates, prompts, forms, checklists, instructions, and a simple tracking habit when needed.</p></article>
+            <article class="process-step"><span>04 / Tune</span><h3>Adjust after real use.</h3><p>The first version teaches us what the business really needs. We refine from evidence.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="offers" class="band">
         <div class="wrap split">
           <div>
-            <h2>A good fit when the work is repetitive, valuable, and currently too manual.</h2>
-            <p>
-              UsefulOps AI is for small businesses that need operational relief without buying
-              an enterprise transformation program or pretending every task needs AI.
-            </p>
+            <div class="section-head">
+              <p class="eyebrow">Offer ladder</p>
+              <h2>Start with clarity, then build only what is worth building.</h2>
+              <p>The Quick Win Audit is the front door. It keeps us from selling a build before we understand the real workflow.</p>
+            </div>
+            <div class="offers">
+              <article class="offer"><strong>Quick Win Audit</strong><span class="price">$497</span><p>Workflow review, ranked opportunities, and the recommended first AI-assisted fix.</p></article>
+              <article class="offer"><strong>Implementation Sprint</strong><span class="price">~$2,000</span><p>Install one to three practical workflows with prompts, templates, instructions, and a tune-up window.</p></article>
+              <article class="offer"><strong>Monthly Support</strong><span class="price">$500/mo</span><p>Keep workflows useful, adjust templates, and identify the next improvement.</p></article>
+            </div>
           </div>
-          <ul>
-            <li>Lead follow-up and customer response drafts that need owner or staff approval.</li>
-            <li>Internal reporting, meeting notes, and status summaries that are always late.</li>
-            <li>Document, email, phone, or spreadsheet workflows with repeatable decision rules.</li>
-            <li>Simple operating dashboards from data the business already controls.</li>
-          </ul>
+          <div>
+            <article class="artifact"><strong>Sample audit output</strong><p>"Your fastest win is missed-lead follow-up. Standardize the first reply, capture the request type, and create a daily owner review queue."</p></article>
+            <article class="artifact"><strong>Sample installed artifact</strong><p>A one-page intake checklist, reusable response draft, follow-up tracker, and staff instruction note.</p></article>
+            <article class="artifact"><strong>What changes Monday morning</strong><p>The team has one place to put the lead, one approved draft to start from, and one owner summary to review.</p></article>
+          </div>
         </div>
       </section>
 
       <section>
         <div class="wrap split">
-          <div>
-            <h2>Simple starting points.</h2>
-            <p>Pricing is scoped before work starts. No fake guarantees, no hidden subscriptions, no video-call treadmill, and no sensitive data in public tools.</p>
+          <div class="section-head">
+            <p class="eyebrow">Boundaries</p>
+            <h2>Practical does not mean reckless.</h2>
+            <p>UsefulOps AI is built for small, useful workflow improvements. Human judgment stays in charge.</p>
           </div>
-          <div class="offer-list">
-            <article class="offer">
-              <h3>Initial Workflow Intake <span class="price">12-15 minutes</span></h3>
-              <p>Best first step when you want to know whether UsefulOps AI can help with one specific workflow.</p>
-            </article>
-            <article class="offer">
-              <h3>Workflow Audit <span class="price">fixed scope</span></h3>
-              <p>Best when you know AI should help but need a clear operating target and a practical first plan.</p>
-            </article>
-            <article class="offer">
-              <h3>Ongoing Support <span class="price">monthly clients</span></h3>
-              <p>Best after the first workflow is live and the business wants monitoring, improvement, and steady follow-through.</p>
-            </article>
-          </div>
+          <ul class="rules">
+            <li>No regulated medical, legal, or financial advice automation without a specific risk review.</li>
+            <li>No autonomous customer messaging unless explicitly scoped and approved.</li>
+            <li>No passwords, payment details, or confidential customer records in intake forms.</li>
+            <li>No giant "AI transformation" projects disguised as quick wins.</li>
+          </ul>
         </div>
       </section>
 
-      <section class="intake" id="intake">
-        <div class="wrap intake-grid">
-          <div class="intake-copy">
-            <div>
-              <p class="eyebrow">Start with the intake form</p>
-              <h2>Share the workflow that needs help.</h2>
-              <p class="section-lede">
-                The form asks for business basics, your biggest pain point, and the repeat workflow
-                Rowan should look at first. Please do not include passwords, payment details,
-                private customer records, or sensitive regulated information.
-              </p>
-            </div>
-            <div class="intake-box">
-              <p>
-                After the form, Rowan can follow up by email or a short scheduled phone intake.
-                The goal is a clear next step, not a long sales call.
-              </p>
-              <div class="actions">
-                <a class="button gold" href="https://docs.google.com/forms/d/e/1FAIpQLSf4I2PCTYqdUgcJhTSK48hG6-RaubbbyEBdTBOzrvg9Vt-Zmw/viewform" target="_blank" rel="noopener">Open intake form</a>
-                <a class="button secondary" href="https://calendar.app.google/j1pPihP5wcXVhhAo8" target="_blank" rel="noopener">Book phone intake</a>
-              </div>
+      <section id="intake" class="band">
+        <div class="wrap split">
+          <div class="intake-panel">
+            <p class="eyebrow">Start here</p>
+            <h2>Tell Rowan what workflow is wasting time.</h2>
+            <p>The intake form asks for the business basics, the process that hurts, the tools involved, and what would make a fix worthwhile.</p>
+            <ul>
+              <li>Use the form when you want the workflow reviewed.</li>
+              <li>Book a short call when the pain is clear and worth discussing.</li>
+              <li>Do not submit private customer data, credentials, or sensitive regulated information.</li>
+            </ul>
+            <div class="intake-actions">
+              <a class="button amber" href="https://docs.google.com/forms/d/e/1FAIpQLSf4I2PCTYqdUgcJhTSK48hG6-RaubbbyEBdTBOzrvg9Vt-Zmw/viewform" target="_blank" rel="noopener">Open intake form</a>
+              <a class="button secondary" href="https://calendar.app.google/j1pPihP5wcXVhhAo8" target="_blank" rel="noopener">Book 15-minute intake</a>
             </div>
           </div>
-          <div class="form-shell" aria-label="UsefulOps AI intake form">
+          <div>
             <iframe
               class="form-frame"
               src="https://docs.google.com/forms/d/e/1FAIpQLSf4I2PCTYqdUgcJhTSK48hG6-RaubbbyEBdTBOzrvg9Vt-Zmw/viewform?embedded=true"
@@ -656,11 +567,10 @@
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="wrap footer-grid">
+    <footer>
+      <div class="wrap">
         <span>UsefulOps AI is an AI Lean Solutions LLC initiative.</span>
-        <span>UsefulOps AI - practical operations help from an AI operated consulting business.</span>
-        <span><a href="mailto:rowan.vale@usefulopsai.com">rowan.vale@usefulopsai.com</a></span>
+        <span>Rowan Vale, AI operator for small business workflows</span>
       </div>
     </footer>
   </body>
