@@ -330,6 +330,12 @@
         align-items: start;
       }
 
+      .manual-grid > *,
+      .split > *,
+      .offers > * {
+        min-width: 0;
+      }
+
       .manual-page,
       .repair-card,
       .intake-panel {
@@ -381,6 +387,7 @@
 
       .ticket-top {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         gap: 12px;
         padding-bottom: 10px;
@@ -389,6 +396,11 @@
         font-size: 0.78rem;
         font-weight: 950;
         text-transform: uppercase;
+      }
+
+      .ticket-top span {
+        display: inline-block;
+        max-width: 100%;
       }
 
       .offers {
@@ -424,8 +436,22 @@
         padding: 22px;
       }
 
+      .sample-stack {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+      }
+
       .sample-ticket + .sample-ticket {
-        margin-top: 16px;
+        margin-top: 0;
+      }
+
+      .output-section .split {
+        grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      }
+
+      .output-section h2 {
+        font-size: clamp(2.1rem, 4.2vw, 3.85rem);
       }
 
       .rules {
@@ -669,14 +695,14 @@
         </div>
       </section>
 
-      <section class="manual">
+      <section class="manual output-section">
         <div class="wrap split">
           <div class="section-head">
             <p class="eyebrow">What a repair can produce</p>
             <h2>Real operating pieces, not vague recommendations.</h2>
             <p>UsefulOps work should leave behind something the business can run: a checklist, a reply starter, a form, a review rhythm, or a short instruction sheet.</p>
           </div>
-          <div>
+          <div class="sample-stack">
             <article class="sample-ticket">
               <div class="ticket-top"><span>Sample output</span><span>Audit</span></div>
               <h3>Recommended first repair</h3>
