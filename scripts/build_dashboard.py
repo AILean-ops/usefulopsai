@@ -144,6 +144,9 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
         "active_clients": scalar(conn, "SELECT COUNT(*) FROM clients WHERE status = 'active'"),
         "open_deliverables": scalar(conn, "SELECT COUNT(*) FROM deliverables WHERE status NOT IN ('delivered', 'cancelled')"),
         "open_tasks": scalar(conn, "SELECT COUNT(*) FROM tasks WHERE status IN ('pending', 'in_progress')"),
+        "crm_leads": scalar(conn, "SELECT COUNT(*) FROM crm_leads"),
+        "crm_new_inquiries": scalar(conn, "SELECT COUNT(*) FROM crm_leads WHERE stage = 'new_inquiry'"),
+        "crm_source_submissions": scalar(conn, "SELECT COUNT(*) FROM crm_source_submissions"),
         "payment_links": rows(
             conn,
             """
@@ -155,6 +158,25 @@ def compute_metrics(conn: sqlite3.Connection) -> dict[str, Any]:
             """,
         ),
         "tasks": rows(conn, "SELECT title, status, priority, updated_at FROM tasks ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END, updated_at DESC LIMIT 8"),
+        "crm_recent_leads": rows(
+            conn,
+            """
+            SELECT company, person_name, primary_email, source_latest, stage, last_seen_at, next_action
+            FROM crm_leads
+            ORDER BY last_seen_at DESC, updated_at DESC
+            LIMIT 8
+            """,
+        ),
+        "latest_crm_integrity_check": rows(
+            conn,
+            """
+            SELECT checked_at, status, source_submission_count, lead_count,
+                   open_followup_count, missing_task_count, duplicate_email_count
+            FROM crm_integrity_checks
+            ORDER BY checked_at DESC
+            LIMIT 1
+            """,
+        ),
         "recent_actions": rows(conn, "SELECT action_at, action_type, summary FROM action_log ORDER BY action_at DESC LIMIT 10"),
         "outreach_results": rows(
             conn,
@@ -268,6 +290,8 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
         ("UsefulOps growth", money(metrics["usefulops_growth_cents"])),
         ("Budget used", f"{money(metrics['budget_used_cents'])} / {money(metrics['budget_limit_cents'])}"),
         ("Active prospects", str(metrics["active_prospects"])),
+        ("CRM leads", str(metrics["crm_leads"])),
+        ("New inquiries", str(metrics["crm_new_inquiries"])),
         ("Undeliverable", str(metrics["undeliverable"])),
         ("Draft quality", str(metrics["avg_outreach_quality_score"] or "n/a")),
         ("Open tasks", str(metrics["open_tasks"])),
@@ -279,6 +303,18 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
     task_rows = "\n".join(
         f"<tr><td>{html.escape(row['title'])}</td><td>{html.escape(row['status'])}</td><td>{html.escape(row['priority'])}</td></tr>"
         for row in metrics["tasks"]
+    )
+    crm_rows = "\n".join(
+        f"<tr><td>{html.escape(row['company'] or row['person_name'] or 'Unknown')}</td><td>{html.escape(row['primary_email'] or '')}</td><td>{html.escape(row['source_latest'])}</td><td>{html.escape(row['stage'])}</td><td>{html.escape(row['next_action'] or '')}</td></tr>"
+        for row in metrics["crm_recent_leads"]
+    )
+    crm_check = metrics["latest_crm_integrity_check"][0] if metrics["latest_crm_integrity_check"] else None
+    crm_check_html = (
+        f"<p><strong>Latest check:</strong> {html.escape(crm_check['status'])} at {html.escape(crm_check['checked_at'])}. "
+        f"Submissions: {int(crm_check['source_submission_count'] or 0)}, leads: {int(crm_check['lead_count'] or 0)}, "
+        f"open follow-ups: {int(crm_check['open_followup_count'] or 0)}, missing/duplicate issues: {int(crm_check['missing_task_count'] or 0) + int(crm_check['duplicate_email_count'] or 0)}.</p>"
+        if crm_check
+        else "<p>No CRM integrity check recorded yet.</p>"
     )
     action_rows = "\n".join(
         f"<li><strong>{html.escape(row['action_type'])}</strong><span>{html.escape(row['summary'])}</span></li>"
@@ -353,6 +389,11 @@ def render_dashboard(metrics: dict[str, Any], snapshot_id: str) -> str:
       <section class="section">
         <h2>Payment Links</h2>
         <table><thead><tr><th>Name</th><th>Amount</th><th>Billing</th><th>Status</th></tr></thead><tbody>{link_rows}</tbody></table>
+      </section>
+      <section class="section">
+        <h2>CRM Leads</h2>
+        {crm_check_html}
+        <table><thead><tr><th>Lead</th><th>Email</th><th>Source</th><th>Stage</th><th>Next action</th></tr></thead><tbody>{crm_rows}</tbody></table>
       </section>
       <section class="section">
         <h2>Tasks</h2>

@@ -46,6 +46,17 @@ The plain `git@github.com:AILean-ops/usefulopsai.git` form failed on this machin
 - Existing Brian test response was marked as baseline on 2026-06-05 so future alerts only fire for new submissions.
 - OpenClaw cron job `06b1222e-7b4a-4607-9ac7-2cd484bd3e55` (`UsefulOps intake form internal follow-up loop`) polls every 10 minutes in an isolated session with `delivery.mode=none`. New submissions are handled internally through SQLite/action-log/task state, not Discord lead alerts. Failure alerts still go to `#announcements` (`1511152439859085463`) with a 1-hour cooldown. Manual forced run on 2026-06-05 completed with `lastRunStatus=ok`.
 
+## CRM v1
+
+- CRM v1 source of truth: `/Users/aileansolutions/usefulopsai/local/data/usefulopsai.sqlite3`.
+- CRM v1 documentation: `/Users/aileansolutions/usefulopsai/docs/CRM-V1.md`.
+- Schema tables added 2026-06-15: `crm_leads`, `crm_source_submissions`, `crm_stage_history`, `crm_touchpoints`, `crm_opportunities`, and `crm_integrity_checks`.
+- Shared helper: `/Users/aileansolutions/usefulopsai/scripts/usefulops_common.py` function `upsert_crm_lead(...)`.
+- Integrity checker: `/Users/aileansolutions/usefulopsai/scripts/crm_integrity_check.py`; run with `--backfill` to create CRM rows for existing `intake_form_responses`.
+- AIPromotionGuy.com Web3Forms watcher `/Users/aileansolutions/.openclaw/workspace/scripts/watch_aipromotion_web3forms.py` now writes both legacy intake/task/prospect/contact rows and CRM rows.
+- UsefulOpsAI.com Google Form checker `/Users/aileansolutions/usefulopsai/scripts/check_intake_responses.py` now writes both legacy intake/task rows and CRM rows.
+- Verification on 2026-06-15: `scripts/crm_integrity_check.py --backfill` returned `ok=true` with 3 source submissions, 2 deduped CRM leads, 0 missing CRM submissions, 0 missing follow-up tasks, and 0 duplicate emails. `scripts/build_dashboard.py` rebuilt the private dashboard with CRM metrics.
+
 ## Realtime Phone Webhook
 
 - Worker source: `/Users/aileansolutions/usefulopsai/workers/realtime-webhook/`.
@@ -169,6 +180,8 @@ Do not place card numbers, API keys, OAuth secrets, customer credentials, or sen
 - 2026-05-31 dry-run verification: `scripts/send_outreach_batch.py --limit 2 --dry-run` succeeded through GOG Gmail dry-run, selected two draft candidates, enforced suppression/opt-out preflight, wrote a dry-run `action_log`, and sent no emails.
 - 2026-06-03 delivery/readability correction: the initial 5-send batch produced one hard bounce (`info@sapperhvac.com`) and one temporary delivery delay (`info@phoenixheatingcoolingauthority.com`). The hard bounce is recorded as `result_category='undeliverable'`, `outcome='undeliverable'`, and a suppression row; the delay is recorded as `result_category='delivery_delayed'` only. Pending drafts were rewritten for a less robotic, less jargon-heavy voice and now pass the pre-send quality threshold.
 - 2026-06-08 UsefulOps-only separation correction: in UsefulOps channels, generic references to "batch", "outreach", "send", "prospects", or "pipeline" must be interpreted as UsefulOps AI unless Brian explicitly names the market-intelligence business. Same-day bounded send: `scripts/send_outreach_batch.py --limit 7 --dry-run` passed, then `scripts/send_outreach_batch.py --limit 7` sent 7 UsefulOps cold-initial emails from `rowan.vale@usefulopsai.com` with 0 skipped and 0 failed; dashboard snapshot `dash-20260608T163153Z-b21bf347` rebuilt afterward. OpenClaw cron job `996ef030-66d0-4f9d-96a5-1488c2fdb876` (`UsefulOps daily outbound batch rail`) runs daily at `10:05 America/Los_Angeles`; it sends up to 10 compliance-cleared UsefulOps draft outreach rows if available, otherwise runs `scripts/operator_loop.py run --trigger cron-1005-outbound-rail --objective "Prepare the next UsefulOps prospect/draft batch or revised outreach variant for revenue-generating outreach." --push` and reports to UsefulOps `#announcements`.
+- 2026-06-10 revenue-bias correction: strategy review now tracks `unresolved_undeliverable` separately from total historical undeliverables. Already-suppressed hard bounces no longer keep the diagnosis stuck at `deliverability_gap`; when sent outreach has no replies and no draft queue, the next action becomes a verified outreach variant batch. Nightly self-improvement now creates `Prepare next UsefulOps verified outreach batch` instead of another cleanup task in that state. Operator loop now refuses to recycle the static seed-list script for verified/revised outreach tasks and records `live_research_required` so the gap is visible.
+- 2026-06-10 one-shot revenue trigger: OpenClaw cron job `c59aaece-a3db-4aec-bab0-6279d4a0c90c` (`UsefulOps live-research outreach batch - 2026-06-11`) is scheduled for `2026-06-11 09:05 America/Los_Angeles`. It runs an isolated agent turn to check Rowan Gmail, live-research 5-8 owner-led service-business prospects, create verified drafts, dry-run `scripts/send_outreach_batch.py --limit 8`, send if inside the UsefulOps authority envelope, update SQLite/action logs, and report to UsefulOps `#announcements`.
 - Suppression CLI examples:
 
 ```bash

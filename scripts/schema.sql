@@ -259,6 +259,102 @@ CREATE TABLE IF NOT EXISTS intake_form_responses (
   raw_json TEXT NOT NULL DEFAULT '{}'
 );
 
+CREATE TABLE IF NOT EXISTS crm_leads (
+  id TEXT PRIMARY KEY,
+  dedupe_key TEXT NOT NULL UNIQUE,
+  person_name TEXT,
+  company TEXT,
+  primary_email TEXT,
+  primary_phone TEXT,
+  website TEXT,
+  business_type TEXT,
+  stage TEXT NOT NULL DEFAULT 'new_inquiry',
+  priority TEXT NOT NULL DEFAULT 'normal',
+  owner TEXT NOT NULL DEFAULT 'rowan',
+  source_first TEXT NOT NULL,
+  source_latest TEXT NOT NULL,
+  first_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_source_record_id TEXT,
+  intake_response_id TEXT REFERENCES intake_form_responses(response_id),
+  prospect_id TEXT REFERENCES prospects(id),
+  client_id TEXT REFERENCES clients(id),
+  urgency TEXT,
+  pain_point TEXT,
+  workflow_needing_help TEXT,
+  next_action TEXT,
+  next_action_at TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS crm_source_submissions (
+  id TEXT PRIMARY KEY,
+  source TEXT NOT NULL,
+  source_record_id TEXT NOT NULL,
+  lead_id TEXT NOT NULL REFERENCES crm_leads(id),
+  intake_response_id TEXT REFERENCES intake_form_responses(response_id),
+  submitted_at TEXT,
+  recorded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  alert_status TEXT,
+  created_task_id TEXT REFERENCES tasks(id),
+  payload_json TEXT NOT NULL DEFAULT '{}',
+  notes TEXT,
+  UNIQUE(source, source_record_id)
+);
+
+CREATE TABLE IF NOT EXISTS crm_stage_history (
+  id TEXT PRIMARY KEY,
+  lead_id TEXT NOT NULL REFERENCES crm_leads(id),
+  changed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  from_stage TEXT,
+  to_stage TEXT NOT NULL,
+  actor TEXT NOT NULL DEFAULT 'rowan',
+  reason TEXT NOT NULL,
+  source_record_id TEXT,
+  notes TEXT
+);
+
+CREATE TABLE IF NOT EXISTS crm_touchpoints (
+  id TEXT PRIMARY KEY,
+  lead_id TEXT NOT NULL REFERENCES crm_leads(id),
+  occurred_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  channel TEXT NOT NULL,
+  direction TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  source TEXT,
+  source_record_id TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS crm_opportunities (
+  id TEXT PRIMARY KEY,
+  lead_id TEXT NOT NULL REFERENCES crm_leads(id),
+  prospect_id TEXT REFERENCES prospects(id),
+  client_id TEXT REFERENCES clients(id),
+  name TEXT NOT NULL,
+  stage TEXT NOT NULL DEFAULT 'new',
+  value_cents INTEGER NOT NULL DEFAULT 0,
+  probability INTEGER NOT NULL DEFAULT 0,
+  next_action TEXT,
+  next_action_at TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS crm_integrity_checks (
+  id TEXT PRIMARY KEY,
+  checked_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status TEXT NOT NULL,
+  source_submission_count INTEGER NOT NULL DEFAULT 0,
+  lead_count INTEGER NOT NULL DEFAULT 0,
+  open_followup_count INTEGER NOT NULL DEFAULT 0,
+  missing_task_count INTEGER NOT NULL DEFAULT 0,
+  duplicate_email_count INTEGER NOT NULL DEFAULT 0,
+  details_json TEXT NOT NULL DEFAULT '{}'
+);
+
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY,
   vendor TEXT NOT NULL,
@@ -365,6 +461,16 @@ CREATE INDEX IF NOT EXISTS idx_suppressions_email ON suppressions(email);
 CREATE INDEX IF NOT EXISTS idx_payment_links_status ON payment_links(status);
 CREATE INDEX IF NOT EXISTS idx_intake_form_submitted_at ON intake_form_responses(submitted_at);
 CREATE INDEX IF NOT EXISTS idx_intake_form_alert_status ON intake_form_responses(alert_status);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_stage ON crm_leads(stage);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_email ON crm_leads(primary_email);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_company ON crm_leads(company);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_updated_at ON crm_leads(updated_at);
+CREATE INDEX IF NOT EXISTS idx_crm_source_submissions_lead_id ON crm_source_submissions(lead_id);
+CREATE INDEX IF NOT EXISTS idx_crm_source_submissions_intake_response_id ON crm_source_submissions(intake_response_id);
+CREATE INDEX IF NOT EXISTS idx_crm_stage_history_lead_id ON crm_stage_history(lead_id);
+CREATE INDEX IF NOT EXISTS idx_crm_touchpoints_lead_id ON crm_touchpoints(lead_id);
+CREATE INDEX IF NOT EXISTS idx_crm_opportunities_lead_id ON crm_opportunities(lead_id);
+CREATE INDEX IF NOT EXISTS idx_crm_integrity_checked_at ON crm_integrity_checks(checked_at);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_revenue_external_id ON revenue(external_id) WHERE external_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_stripe_sync_runs_synced_at ON stripe_sync_runs(synced_at);
 CREATE INDEX IF NOT EXISTS idx_dashboard_snapshots_snapshot_at ON dashboard_snapshots(snapshot_at);

@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from usefulops_common import upsert_crm_lead
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "local" / "data" / "usefulopsai.sqlite3"
@@ -203,9 +205,11 @@ def insert_response(
             f"alert_status={alert_status}",
         ),
     )
+    task_id: str | None = None
     if alert_status == "pending":
         business = row.get("business_name") or "unknown business"
         urgency = row.get("urgency") or "not specified"
+        task_id = new_id("task-intake")
         conn.execute(
             """
             INSERT INTO tasks (
@@ -215,7 +219,7 @@ def insert_response(
             VALUES (?, ?, 'pending', 'high', 'rowan', 'intake_form_response', ?, ?, ?, ?)
             """,
             (
-                new_id("task-intake"),
+                task_id,
                 f"Review UsefulOps intake: {business}",
                 row["response_id"],
                 (
@@ -228,6 +232,27 @@ def insert_response(
                 utc_now(),
             ),
         )
+    upsert_crm_lead(
+        conn,
+        source="usefulops_google_form",
+        source_record_id=row["response_id"],
+        intake_response_id=row["response_id"],
+        submitted_at=row.get("submitted_at"),
+        alert_status=alert_status,
+        created_task_id=task_id,
+        person_name=row.get("name"),
+        email=row.get("email"),
+        phone=row.get("phone"),
+        company=row.get("business_name"),
+        website=row.get("website"),
+        business_type=row.get("business_type"),
+        urgency=row.get("urgency"),
+        pain_point=row.get("pain_point"),
+        workflow_needing_help=row.get("workflow_needing_help"),
+        payload=row,
+        notes="UsefulOpsAI.com workflow intake Google Form.",
+        actor="rowan",
+    )
     return True
 
 
