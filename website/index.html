@@ -3,756 +3,80 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>UsefulOps AI | Workflow Repair for Owner-Led Businesses</title>
-    <meta name="description" content="UsefulOps AI helps owner-led small businesses repair one broken workflow at a time with practical AI-assisted checklists, templates, forms, and follow-up support." />
-    <meta property="og:title" content="UsefulOps AI" />
-    <meta property="og:description" content="Workflow repair for owner-led businesses." />
-    <meta property="og:image" content="/images/workflow-repair-bench.jpg" />
-    <link rel="preload" as="image" href="/images/workflow-repair-bench.jpg" />
+    <title>UsefulOps AI</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="UsefulOps AI is currently archived." />
     <style>
       :root {
         color-scheme: light;
-        --ink: #172028;
-        --soft-ink: #334155;
-        --muted: #63707c;
-        --cream: #f3e4bf;
-        --paper: #fff6d8;
-        --shop: #172a32;
-        --teal: #1b726d;
-        --blue: #234b63;
-        --gold: #d49a2a;
-        --red: #b84732;
-        --green: #e4edda;
-        --line: rgba(23, 32, 40, 0.32);
-        --max: 1160px;
+        --ink: #172033;
+        --muted: #5f6b7a;
+        --paper: #f7f8fb;
+        --line: #d9dee8;
+        --blue: #1f4f8f;
       }
 
       * { box-sizing: border-box; }
 
-      html { scroll-behavior: smooth; }
-
       body {
+        min-height: 100vh;
         margin: 0;
-        color: var(--ink);
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        line-height: 1.55;
-        letter-spacing: 0;
-        background:
-          radial-gradient(circle at 10% 8%, rgba(212, 154, 42, 0.25), transparent 25rem),
-          radial-gradient(circle at 88% 20%, rgba(27, 114, 109, 0.18), transparent 28rem),
-          linear-gradient(rgba(23, 32, 40, 0.032) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(23, 32, 40, 0.032) 1px, transparent 1px),
-          var(--cream);
-        background-size: auto, auto, 28px 28px, 28px 28px, auto;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-        opacity: 0.18;
-        background-image: radial-gradient(circle, rgba(23, 32, 40, 0.45) 0 1px, transparent 1.8px);
-        background-size: 10px 10px;
-        mix-blend-mode: multiply;
-      }
-
-      a { color: inherit; }
-
-      img {
-        display: block;
-        max-width: 100%;
-      }
-
-      .wrap {
-        width: min(var(--max), calc(100% - 40px));
-        margin: 0 auto;
-      }
-
-      header {
-        position: sticky;
-        top: 0;
-        z-index: 40;
-        background: rgba(243, 228, 191, 0.94);
-        border-bottom: 3px solid var(--ink);
-        box-shadow: 0 8px 0 rgba(23, 32, 40, 0.08);
-        backdrop-filter: blur(14px);
-      }
-
-      nav {
-        min-height: 76px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        color: var(--ink);
-        text-decoration: none;
-      }
-
-      .brand-mark {
-        width: 52px;
-        height: 46px;
         display: grid;
         place-items: center;
-        color: #fff5d2;
-        background: var(--blue);
-        border: 3px solid var(--ink);
-        box-shadow: 5px 5px 0 var(--ink);
-        font-weight: 950;
-      }
-
-      .brand-text {
-        display: grid;
-        gap: 1px;
-      }
-
-      .brand strong {
-        font-size: 1.12rem;
-        line-height: 1;
-      }
-
-      .brand span {
-        color: var(--soft-ink);
-        font-size: 0.82rem;
-        font-weight: 700;
-      }
-
-      .nav-links {
-        display: flex;
-        gap: 18px;
-        color: #354253;
-        font-size: 0.91rem;
-        font-weight: 850;
-      }
-
-      .nav-links a { text-decoration: none; }
-
-      .button {
-        display: inline-flex;
-        min-height: 48px;
-        align-items: center;
-        justify-content: center;
-        padding: 12px 18px;
-        border: 3px solid var(--ink);
+        padding: 32px;
         color: var(--ink);
-        background: var(--gold);
-        box-shadow: 5px 5px 0 var(--ink);
-        font: inherit;
-        font-weight: 900;
-        text-decoration: none;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-      }
-
-      .button:hover {
-        transform: translateY(-2px);
-        box-shadow: 7px 7px 0 var(--ink);
-      }
-
-      .button.dark {
-        color: #fff6d8;
-        background: var(--blue);
-      }
-
-      .button.paper {
         background: var(--paper);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
       }
 
-      .hero {
-        position: relative;
-        isolation: isolate;
-        min-height: calc(100svh - 76px);
-        display: grid;
-        align-items: end;
-        overflow: hidden;
-        color: #fff6d8;
-        background: var(--shop);
+      main {
+        width: min(680px, 100%);
+        padding: clamp(28px, 6vw, 52px);
+        border: 1px solid var(--line);
+        background: #fff;
       }
 
-      .hero img {
-        position: absolute;
-        inset: 0;
-        z-index: -3;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-      }
-
-      .hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -2;
-        background:
-          linear-gradient(90deg, rgba(10, 17, 22, 0.88) 0%, rgba(10, 17, 22, 0.64) 34%, rgba(10, 17, 22, 0.2) 68%),
-          linear-gradient(0deg, rgba(10, 17, 22, 0.84), rgba(10, 17, 22, 0.1) 46%);
-      }
-
-      .hero::after {
-        content: "";
-        position: absolute;
-        inset: 16px;
-        z-index: -1;
-        border: 2px solid rgba(255, 246, 216, 0.42);
-        box-shadow: inset 0 0 54px rgba(0, 0, 0, 0.5);
-        pointer-events: none;
-      }
-
-      .hero-inner {
-        width: min(1280px, calc(100% - 40px));
-        margin: 0 auto;
-        padding: clamp(72px, 12vw, 132px) 0 clamp(40px, 8vw, 76px);
-      }
+      p { margin: 0; }
 
       .eyebrow {
-        margin: 0 0 14px;
-        color: var(--gold);
-        font-size: 0.82rem;
-        font-weight: 950;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-      }
-
-      h1,
-      h2 {
-        margin: 0;
-        letter-spacing: 0;
-        text-wrap: balance;
       }
 
       h1 {
-        max-width: 780px;
-        font-size: clamp(3.2rem, 8vw, 7.6rem);
-        line-height: 0.88;
-        text-transform: uppercase;
-        text-shadow: 0 7px 0 rgba(0, 0, 0, 0.34);
+        margin: 14px 0 16px;
+        font-size: clamp(2rem, 8vw, 4rem);
+        line-height: 1;
+        letter-spacing: 0;
       }
 
-      h2 {
-        font-size: clamp(2.1rem, 5vw, 4.7rem);
-        line-height: 0.98;
-      }
-
-      h3 {
-        margin: 0;
-        font-size: 1.22rem;
-        line-height: 1.1;
-      }
-
-      .lede {
-        max-width: 650px;
-        margin: 22px 0 0;
-        color: #f1ddb1;
-        font-size: clamp(1.05rem, 2vw, 1.3rem);
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 28px;
-      }
-
-      section {
-        padding: clamp(50px, 8vw, 88px) 0;
-      }
-
-      .section-head {
-        max-width: 780px;
-        margin-bottom: 30px;
-      }
-
-      .section-head p,
-      .note-text {
-        margin: 14px 0 0;
-        color: var(--soft-ink);
+      .copy {
+        max-width: 52ch;
+        color: var(--muted);
         font-size: 1.05rem;
       }
 
-      .job-board {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0;
-        border: 3px solid var(--ink);
-        background: var(--ink);
-        box-shadow: 12px 12px 0 rgba(23, 32, 40, 0.14);
-      }
-
-      .job-card {
-        position: relative;
-        min-height: 240px;
-        padding: 24px 20px 22px;
-        background: var(--paper);
-        border-right: 3px solid var(--ink);
-      }
-
-      .job-card:last-child { border-right: 0; }
-
-      .job-card::before {
-        content: "WORK ORDER";
+      a {
         display: inline-flex;
-        margin-bottom: 16px;
-        padding: 4px 9px;
-        color: #fff6d8;
-        background: var(--red);
-        border: 3px solid var(--ink);
-        font-size: 0.72rem;
-        font-weight: 950;
-      }
-
-      .job-card p,
-      .manual-page p,
-      .offer-ticket p,
-      .sample-ticket p,
-      .repair-card p {
-        margin: 10px 0 0;
-        color: var(--muted);
-      }
-
-      .manual {
-        background: #efe0b7;
-        border-top: 3px solid var(--ink);
-        border-bottom: 3px solid var(--ink);
-      }
-
-      .manual-grid,
-      .split {
-        display: grid;
-        grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1fr);
-        gap: clamp(30px, 6vw, 70px);
-        align-items: start;
-      }
-
-      .manual-grid > *,
-      .split > *,
-      .offers > * {
-        min-width: 0;
-      }
-
-      .manual-page,
-      .repair-card,
-      .intake-panel {
-        border: 3px solid var(--ink);
-        background: var(--paper);
-        box-shadow: 10px 10px 0 rgba(23, 32, 40, 0.14);
-      }
-
-      .manual-page {
-        padding: clamp(24px, 4vw, 38px);
-        background:
-          linear-gradient(rgba(23, 32, 40, 0.08) 1px, transparent 1px),
-          var(--paper);
-        background-size: 100% 32px;
-      }
-
-      .manual-list {
-        display: grid;
-        gap: 14px;
-        margin: 24px 0 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .manual-list li {
-        display: grid;
-        grid-template-columns: 34px 1fr;
-        gap: 12px;
-        align-items: start;
-        color: var(--soft-ink);
-      }
-
-      .manual-list li span {
-        width: 34px;
-        height: 34px;
-        display: grid;
-        place-items: center;
-        color: #fff6d8;
-        background: var(--teal);
-        border: 3px solid var(--ink);
-        font-weight: 950;
-      }
-
-      .repair-card {
-        padding: 22px;
-      }
-
-      .repair-card + .repair-card { margin-top: 16px; }
-
-      .ticket-top {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 12px;
-        padding-bottom: 10px;
-        margin-bottom: 14px;
-        border-bottom: 3px dashed rgba(23, 32, 40, 0.44);
-        font-size: 0.78rem;
-        font-weight: 950;
-        text-transform: uppercase;
-      }
-
-      .ticket-top span {
-        display: inline-block;
-        max-width: 100%;
-      }
-
-      .offers {
-        display: grid;
-        grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1fr);
-        gap: clamp(30px, 6vw, 70px);
-        align-items: start;
-      }
-
-      .offer-stack {
-        display: grid;
-        gap: 16px;
-      }
-
-      .offer-ticket {
-        border: 3px solid var(--ink);
-        background: #fff3ca;
-        box-shadow: 8px 8px 0 rgba(23, 32, 40, 0.12);
-        padding: 22px;
-      }
-
-      .price {
-        display: block;
-        margin-top: 10px;
-        color: var(--teal);
-        font-size: 1.55rem;
-        font-weight: 950;
-      }
-
-      .sample-ticket {
-        border: 3px solid var(--ink);
-        background: #e7f0dc;
-        padding: 22px;
-      }
-
-      .sample-stack {
-        display: grid;
-        gap: 16px;
-        align-content: start;
-      }
-
-      .sample-ticket + .sample-ticket {
-        margin-top: 0;
-      }
-
-      .output-section .split {
-        grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-      }
-
-      .output-section h2 {
-        font-size: clamp(2.1rem, 4.2vw, 3.85rem);
-      }
-
-      .rules {
-        display: grid;
-        gap: 12px;
-        margin: 20px 0 0;
-        padding-left: 1.15rem;
-        color: var(--soft-ink);
-      }
-
-      .intake {
-        background: var(--shop);
-        color: #fff6d8;
-        border-top: 3px solid var(--ink);
-      }
-
-      .intake .eyebrow { color: var(--gold); }
-
-      .intake-panel {
-        color: var(--ink);
-        padding: clamp(24px, 4vw, 36px);
-      }
-
-      .intake-panel p,
-      .intake-panel li {
-        color: var(--soft-ink);
-      }
-
-      .intake-panel ul {
-        display: grid;
-        gap: 10px;
-        margin: 18px 0 0;
-        padding-left: 1.15rem;
-      }
-
-      .intake-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 24px;
-      }
-
-      .form-frame {
-        width: 100%;
-        min-height: 790px;
-        border: 3px solid var(--ink);
-        background: #fff;
-        box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.22);
-      }
-
-      footer {
-        padding: 30px 0;
-        color: #4b5563;
-        background: var(--paper);
-        border-top: 3px solid var(--ink);
-        font-size: 0.92rem;
-      }
-
-      footer .wrap {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 12px 20px;
-      }
-
-      @media (max-width: 920px) {
-        .nav-links { display: none; }
-
-        .hero {
-          min-height: auto;
-        }
-
-        .hero img {
-          object-position: 58% center;
-        }
-
-        .job-board,
-        .manual-grid,
-        .split,
-        .offers {
-          grid-template-columns: 1fr;
-        }
-
-        .output-section .split {
-          grid-template-columns: 1fr;
-        }
-
-        .job-card,
-        .job-card:last-child {
-          border-right: 0;
-          border-bottom: 3px solid var(--ink);
-        }
-
-        .job-card:last-child { border-bottom: 0; }
-      }
-
-      @media (max-width: 560px) {
-        .wrap,
-        .hero-inner {
-          width: min(100% - 28px, var(--max));
-        }
-
-        header { position: relative; }
-
-        nav { min-height: 70px; }
-
-        .brand span { display: none; }
-
-        h1 {
-          font-size: clamp(3rem, 16vw, 5rem);
-        }
-
-        h2 {
-          font-size: clamp(2rem, 12vw, 3.25rem);
-        }
-
-        .button,
-        .hero-actions,
-        .intake-actions {
-          width: 100%;
-        }
-
-        .hero::after { inset: 8px; }
+        margin-top: 28px;
+        color: var(--blue);
+        font-weight: 700;
       }
     </style>
   </head>
   <body>
-    <header>
-      <nav class="wrap" aria-label="Primary">
-        <a class="brand" href="/">
-          <span class="brand-mark" aria-hidden="true">UO</span>
-          <span class="brand-text">
-            <strong>UsefulOps AI</strong>
-            <span>Workflow repair for owner-led businesses</span>
-          </span>
-        </a>
-        <div class="nav-links" aria-label="Page sections">
-          <a href="#problems">Problems</a>
-          <a href="#method">Method</a>
-          <a href="#offers">Offers</a>
-          <a href="#intake">Intake</a>
-        </div>
-      </nav>
-    </header>
-
     <main>
-      <section class="hero">
-        <img src="/images/workflow-repair-bench.jpg" alt="A retro service bench where an operations specialist and business owner review a workflow map, job tickets, and a simple assistant terminal." />
-        <div class="hero-inner">
-          <p class="eyebrow">A repair bench for messy business work</p>
-          <h1>Fix the workflow that keeps dropping the ball.</h1>
-          <p class="lede">UsefulOps AI helps small businesses turn repeat work into clear steps, useful drafts, simple checklists, and follow-up habits your team can actually use.</p>
-          <div class="actions">
-            <a class="button" href="#intake">Start a Quick Win Audit</a>
-            <a class="button paper" href="#problems">See what we fix</a>
-          </div>
-        </div>
-      </section>
-
-      <section id="problems">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Bring the work that hurts</p>
-            <h2>AI is useful when it fixes a real business problem.</h2>
-            <p>We do not start by recommending a new AI tool. We start by determining your pain point; like repeat tasks that waste time, get handled differently by different people, or are dropped when everyone is busy.</p>
-          </div>
-          <div class="job-board" aria-label="Common workflow repair orders">
-            <article class="job-card">
-              <h3>Leads are not followed up consistently.</h3>
-              <p>Repair: standard first replies, lead notes, follow-up reminders, and a simple owner review queue.</p>
-            </article>
-            <article class="job-card">
-              <h3>Customer messages take too long.</h3>
-              <p>Repair: approved reply starters for common questions, complaints, reviews, appointment prep, and status updates.</p>
-            </article>
-            <article class="job-card">
-              <h3>Important knowledge lives in someone's head.</h3>
-              <p>Repair: checklists, job aids, training notes, and searchable operating instructions built from what already works.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="manual" id="method">
-        <div class="wrap manual-grid">
-          <div class="manual-page">
-            <p class="eyebrow">Shop method</p>
-            <h2>Small enough to finish. Useful enough to keep.</h2>
-            <p class="note-text">A workflow repair should make Monday morning easier, not create a giant AI project that dies in a folder.</p>
-            <ul class="manual-list">
-              <li><span>1</span><div><strong>Map the current mess.</strong><br />Where does the work start, stall, repeat, or vanish?</div></li>
-              <li><span>2</span><div><strong>Pick the first repair.</strong><br />Choose the fix with the clearest value and the least drama.</div></li>
-              <li><span>3</span><div><strong>Install the working version.</strong><br />Create the prompt, template, checklist, form, or review step.</div></li>
-              <li><span>4</span><div><strong>Tune after real use.</strong><br />Keep what works. Adjust what the team ignores.</div></li>
-            </ul>
-          </div>
-          <div>
-            <article class="repair-card">
-              <div class="ticket-top"><span>Before</span><span>Lead follow-up</span></div>
-              <h3>Every new lead gets handled differently.</h3>
-              <p>Some get fast replies. Some wait. Some vanish because nobody is sure who owns the next step.</p>
-            </article>
-            <article class="repair-card">
-              <div class="ticket-top"><span>After</span><span>UsefulOps repair</span></div>
-              <h3>One intake note, one reply starter, one review queue.</h3>
-              <p>The team knows where the lead goes, what the first message should cover, and what the owner needs to review.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="offers">
-        <div class="wrap offers">
-          <div>
-            <p class="eyebrow">How we start</p>
-            <h2>Start with clarity. Build only what is worth building.</h2>
-            <p class="note-text">The Quick Win Audit is the front door. It keeps us from selling a build before we understand the business problem.</p>
-            <ul class="rules">
-              <li>No giant "AI transformation" project.</li>
-              <li>No tool worship.</li>
-              <li>No customer-facing automation unless it is explicitly scoped and approved.</li>
-              <li>No private customer data, passwords, or regulated details in intake forms.</li>
-            </ul>
-          </div>
-          <div class="offer-stack">
-            <article class="offer-ticket">
-              <div class="ticket-top"><span>Service ticket</span><span>01</span></div>
-              <h3>Quick Win Audit</h3>
-              <span class="price">$497</span>
-              <p>Workflow review, ranked opportunities, and the recommended first AI-assisted fix.</p>
-            </article>
-            <article class="offer-ticket">
-              <div class="ticket-top"><span>Service ticket</span><span>02</span></div>
-              <h3>Implementation Sprint</h3>
-              <span class="price">~$2,000</span>
-              <p>Install one to three practical workflows with prompts, templates, instructions, and a tune-up window.</p>
-            </article>
-            <article class="offer-ticket">
-              <div class="ticket-top"><span>Service ticket</span><span>03</span></div>
-              <h3>Monthly Support</h3>
-              <span class="price">$500/mo</span>
-              <p>Keep workflows useful, adjust templates, and identify the next practical repair.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="manual output-section">
-        <div class="wrap split">
-          <div class="section-head">
-            <p class="eyebrow">What a repair can produce</p>
-            <h2>Real operating pieces, not vague recommendations.</h2>
-            <p>UsefulOps work should leave behind something the business can run: a checklist, a reply starter, a form, a review rhythm, or a short instruction sheet.</p>
-          </div>
-          <div class="sample-stack">
-            <article class="sample-ticket">
-              <div class="ticket-top"><span>Sample output</span><span>Audit</span></div>
-              <h3>Recommended first repair</h3>
-              <p>Your fastest win is missed-lead follow-up. Standardize the first reply, capture the request type, and create a daily owner review queue.</p>
-            </article>
-            <article class="sample-ticket">
-              <div class="ticket-top"><span>Sample output</span><span>Install</span></div>
-              <h3>Monday morning package</h3>
-              <p>A one-page intake checklist, reusable response draft, follow-up tracker, and staff instruction note.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="intake" id="intake">
-        <div class="wrap split">
-          <div class="intake-panel">
-            <p class="eyebrow">Open a repair ticket</p>
-            <h2>Tell Rowan what workflow is wasting time.</h2>
-            <p>The intake form asks for the business basics, the process that hurts, the tools involved, and what would make a fix worthwhile.</p>
-            <ul>
-              <li>Use the form when you want the workflow reviewed.</li>
-              <li>Book a short call when the pain is clear and worth discussing.</li>
-              <li>Do not submit private customer data, credentials, or sensitive regulated information.</li>
-            </ul>
-            <div class="intake-actions">
-              <a class="button" href="https://docs.google.com/forms/d/e/1FAIpQLSf4I2PCTYqdUgcJhTSK48hG6-RaubbbyEBdTBOzrvg9Vt-Zmw/viewform" target="_blank" rel="noopener">Open intake form</a>
-              <a class="button paper" href="https://calendar.app.google/j1pPihP5wcXVhhAo8" target="_blank" rel="noopener">Book 15-minute intake</a>
-            </div>
-          </div>
-          <div>
-            <iframe
-              class="form-frame"
-              src="https://docs.google.com/forms/d/e/1FAIpQLSf4I2PCTYqdUgcJhTSK48hG6-RaubbbyEBdTBOzrvg9Vt-Zmw/viewform?embedded=true"
-              title="UsefulOps AI Workflow Intake"
-            >Loading intake form...</iframe>
-          </div>
-        </div>
-      </section>
+      <p class="eyebrow">Archived project</p>
+      <h1>UsefulOps AI</h1>
+      <p class="copy">
+        This project is no longer active. AI Lean Solutions is simplifying its public web
+        presence and currently supports only the main company site.
+      </p>
+      <a href="https://aileansolutions.com/">Visit AI Lean Solutions</a>
     </main>
-
-    <footer>
-      <div class="wrap">
-        <span>UsefulOps AI is an AI Lean Solutions LLC initiative.</span>
-        <span>(c) 2026 AI Lean Solutions.</span>
-      </div>
-    </footer>
   </body>
 </html>
